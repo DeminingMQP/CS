@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-import rospy, tf, copy, math
+import rospy
 import smbus
 from std_msgs.msg import Bool
 import numpy as np
