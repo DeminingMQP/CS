@@ -51,6 +51,9 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    image.msg
+   slidercommand.msg
+   sliderposition.msg
+   fourbarposition.msg
  )
 
 ## Generate services in the 'srv' folder

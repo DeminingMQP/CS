@@ -3,15 +3,19 @@ import rospy, math
 from std_msgs.msg import Bool
 import numpy as np
 import RPi.GPIO as GPIO
+from demining_mqp.msg import*
 
 
 class fourbar:
     def __init__(self):
-        self._sendFourBarData = rospy.Publisher('/FourBarPos', np.uint8t,
+        self._sendFourBarData = rospy.Publisher('/FourBarPos', fourbarposition,
                                                 queue_size=5)  # send to nav system with a new message type
         self._sendObstacle = rospy.Publisher('/SteepSlope', Bool, queue_size=1)
         self.upPin = 13
         self.downPin = 14
+        self.EncPin = 15
+        self.MotorSpeedPin = 16
+        self.MotorDirPin = 17
         GPIO.setmode(GPIO.Board)
         GPIO.setup(self.upPin, GPIO.IN)  # need to pick a pin
         GPIO.setup(self.downPin, GPIO.IN)  # need to pick a pin
