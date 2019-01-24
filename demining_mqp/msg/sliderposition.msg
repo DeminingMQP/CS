@@ -1,0 +1,2 @@
+uint32 motorstep
+uint8 direction
