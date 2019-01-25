@@ -18,7 +18,7 @@ class CompVisionNode:
 
         # must be gray-scale image which it should be from the camera
         gray = data  # make this equal to the image from the camera
-
+        print gray
         reconstruct = np.zeros((60, 80, 1), dtype=np.uint8)
 
         index = 0
