@@ -1,0 +1,7 @@
+<launch>
+
+    <node pkg="demining_mqp" type="ViewIRCam.py" name="ViewIRCam" />
+
+
+
+</launch>
