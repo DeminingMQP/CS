@@ -36,7 +36,7 @@ class CompVisionNode:
                 cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
             self._LandmineDetected.publish(True)
-            
+
         else:
             self._LandmineDetected.publish(False)
         output = np.uint8(output)
