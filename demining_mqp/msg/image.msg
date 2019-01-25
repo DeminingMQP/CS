@@ -1,1 +1,1 @@
-std_msgs/UInt8[] data
+uint8[] data
