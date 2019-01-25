@@ -1,0 +1,8 @@
+<launch>
+
+    <node pkg="demining_mqp" type="IRCamera.py" name="IRCamera" />
+
+    <node pkg="demining_mqp" type="CompVision.py" name="CompVision" />
+
+
+</launch>
