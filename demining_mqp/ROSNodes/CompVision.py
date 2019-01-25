@@ -22,8 +22,8 @@ class CompVisionNode:
         index = 0
         for x in range (0,80):
             for y in range(0,60):
-                reconstruct[0][x][y]= gray[index]
-                index = index +1
+                reconstruct[x][y] = gray[index]
+                index = index + 1
 
         output = reconstruct.copy()
         circles = cv2.HoughCircles(reconstruct, cv2.cv.CV_HOUGH_GRADIENT, 1.2, 100)  # last arg is pixels

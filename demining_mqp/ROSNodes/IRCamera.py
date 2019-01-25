@@ -28,6 +28,7 @@ class IRCam:
                     for y in x:
                         for z in y:
                             finalImage.append(z)
+                print(finalImage)
                 self._receivedImage.publish(finalImage)
 
 
