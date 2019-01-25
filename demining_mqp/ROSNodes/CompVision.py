@@ -17,7 +17,7 @@ class CompVisionNode:
     def searchformine(self, data):
 
         # must be gray-scale image which it should be from the camera
-        gray = data  # make this equal to the image from the camera
+        gray = data.image  # make this equal to the image from the camera
         reconstruct = np.zeros((60, 80, 1), dtype=np.uint8)
         index = 0
         for x in range (0,80):
