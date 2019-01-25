@@ -1,4 +1,4 @@
-#!/home/nick/Desktop/MQP/CS/venv/bin/python
+#!/home/nick/catkin_ws/src/CS/venv/bin/python
 
 import sys
 import getopt

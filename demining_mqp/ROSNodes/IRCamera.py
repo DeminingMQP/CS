@@ -10,7 +10,7 @@ from rospy.numpy_msg import *
 
 class IRCam:
     def __init__(self):
-        self._receivedImage = rospy.Publisher('/RawIRImage', numpy_msg(image), queue_size=5)
+        self._receivedImage = rospy.Publisher('/RawIRImage', image, queue_size=5)
         self.last_nr = None
 
     def capture(self):
@@ -22,8 +22,10 @@ class IRCam:
                 self.last_nr = nr
                 cv2.normalize(lepton_buf, lepton_buf, 0, 65535, cv2.NORM_MINMAX)
                 np.right_shift(lepton_buf, 8, lepton_buf)
-                finalImage = np.uint8(lepton_buf)
-                finalImage = np.ravel(finalImage, 1)
+                lepton_buf = np.uint8(lepton_buf)
+                finalImage = []
+                for x in lepton_buf:
+                    finalImage.append(x)
                 self._receivedImage.publish(finalImage)
 
 
