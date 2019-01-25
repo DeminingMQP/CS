@@ -27,7 +27,7 @@ class IRCam:
                 for x in lepton_buf:
                     for y in x:
                         for z in y:
-                            finalImage.append(y)
+                            finalImage.append(z)
                 self._receivedImage.publish(finalImage)
 
 
