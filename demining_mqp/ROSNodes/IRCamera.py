@@ -12,7 +12,7 @@ from std_msgs import *
 
 class IRCam:
     def __init__(self):
-        self._receivedImage = rospy.Publisher('/RawIRImage', int, queue_size=5)
+        self._receivedImage = rospy.Publisher('/RawIRImage', image, queue_size=5)
         self.last_nr = None
 
     def capture(self):
