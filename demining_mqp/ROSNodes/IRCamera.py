@@ -9,7 +9,7 @@ from demining_mqp.msg import *
 
 class IRCam:
     def __init__(self):
-        self._receivedImage = rospy.Publisher('/RawIRImage', image, queue_size=5)
+        self._receivedImage = rospy.Publisher('/RawIRImage', image3, queue_size=5)
         self.last_nr = None
 
     def capture(self):
