@@ -2,7 +2,7 @@
 import rospy
 import numpy as np
 import cv2
-from std_msgs.msg import Bool
+from std_msgs.msg import*
 
 from demining_mqp.msg import*
 from rospy.numpy_msg import *
