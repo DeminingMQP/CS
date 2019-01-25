@@ -31,7 +31,7 @@ class IRCam:
                         for z in y:
                             temp.append(z)
                 finalImage.data = temp
-                print(finalImage)
+
                 self._receivedImage.publish(finalImage)
 
 
