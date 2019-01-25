@@ -20,6 +20,7 @@ class CompVisionNode:
         gray = data.data  # make this equal to the image from the camera
         #print len(gray)
         reconstruct = np.zeros((60, 80, 1), dtype=np.uint8)
+        print("Array")
         print(reconstruct)
         index = 0
         for x in range (0,80):
