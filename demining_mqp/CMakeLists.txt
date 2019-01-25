@@ -51,8 +51,8 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    image.msg
-   image2.msg
-   image3.msg
+   #image2.msg
+   #image3.msg
    slidercommand.msg
    sliderposition.msg
    fourbarposition.msg

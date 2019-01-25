@@ -23,6 +23,7 @@ class IRCam:
                 cv2.normalize(lepton_buf, lepton_buf, 0, 65535, cv2.NORM_MINMAX)
                 np.right_shift(lepton_buf, 8, lepton_buf)
                 finalImage = np.uint8(lepton_buf)
+                finalImage = np.ravel(finalImage, 1)
                 self._receivedImage.publish(finalImage)
 
 
