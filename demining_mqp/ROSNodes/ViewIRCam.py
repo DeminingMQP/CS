@@ -8,7 +8,7 @@ import time
 
 class IRCamView:
     def __init__(self):
-        self._processedImage = rospy.Subscriber('/ProcessedImage', image, self.showimage, queue_size=5)
+        self._processedImage = rospy.Subscriber('/ProcessedImage', image2, self.showimage, queue_size=5)
 
     def showimage(self, data):
         pic = data
@@ -17,7 +17,7 @@ class IRCamView:
         index = 0
         for x in range(0, 60):
             for y in range(0, 80):
-                reconstruct[x][y][0] = ord(pic.data[index])
+                reconstruct[x][y][0] = pic.data[index]
                 index = index + 1
         print "Reconstructed image"
         resizedImage = cv2.resize(reconstruct, (800, 600))
