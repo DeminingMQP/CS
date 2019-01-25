@@ -11,7 +11,7 @@ from rospy.numpy_msg import *
 class CompVisionNode:
     def __init__(self):
         self._receivedImage = rospy.Subscriber('/RawIRImage', image, self.searchformine, queue_size=5)
-        self._processedImage = rospy.Publisher('/ProcessedImage', image2, queue_size=5)
+        self._processedImage = rospy.Publisher('/ProcessedImage', image, queue_size=5)
         self._LandmineDetected = rospy.Publisher('/IRLandmineDet', Bool, queue_size=1)
 
     def searchformine(self, data):
@@ -28,6 +28,7 @@ class CompVisionNode:
         #print "Reconstructed image"
 
         output = reconstruct.copy()
+        #output = cv2.cvtColor(output, cv2.COLOR_GRAY2RGB)
         circles = cv2.HoughCircles(reconstruct, cv2.HOUGH_GRADIENT, 1.2, 100)  # last arg is pixels
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
