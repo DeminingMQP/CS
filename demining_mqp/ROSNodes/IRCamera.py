@@ -21,6 +21,7 @@ class IRCam:
             lepton_buf = np.zeros((60, 80, 1), dtype=np.uint16)
             last_nr = 0
             _, nr = l.capture(lepton_buf)
+            print "got image"
             if nr != self.last_nr:
                 self.last_nr = nr
                 cv2.normalize(lepton_buf, lepton_buf, 0, 65535, cv2.NORM_MINMAX)
