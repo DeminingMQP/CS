@@ -5,12 +5,13 @@ import cv2
 from std_msgs.msg import Bool
 
 from demining_mqp.msg import*
+from rospy.numpy_msg import *
 
 
 class CompVisionNode:
     def __init__(self):
-        self._receivedImage = rospy.Subscriber('/RawIRImage', image3, self.searchformine, queue_size=5)
-        self._processedImage = rospy.Publisher('/ProcessedImage', image3, queue_size=5)
+        self._receivedImage = rospy.Subscriber('/RawIRImage', numpy_msg(image), self.searchformine, queue_size=5)
+        self._processedImage = rospy.Publisher('/ProcessedImage', numpy_msg(image), queue_size=5)
         self._LandmineDetected = rospy.Publisher('/IRLandmineDet', Bool, queue_size=1)
 
     def searchformine(self, data):

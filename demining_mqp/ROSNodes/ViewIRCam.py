@@ -2,10 +2,11 @@
 import rospy
 import cv2
 from demining_mqp.msg import*
+from rospy.numpy_msg import *
 
 class IRCamView:
     def __init__(self):
-        self._processedImage = rospy.Subscriber('/ProcessedImage', image3, self.showimage, queue_size=5)
+        self._processedImage = rospy.Subscriber('/ProcessedImage', numpy_msg(image), self.showimage, queue_size=5)
 
     def showimage(self, data):
         resizedImage = cv2.resize(data, (800, 600))
