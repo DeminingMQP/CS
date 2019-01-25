@@ -34,16 +34,19 @@ class CompVisionNode:
             for (x, y, r) in circles:
                 cv2.circle(output, (x, y), r, (0, 255, 0), 4)
                 cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-            output = np.uint8(output)
-            finalImage = []
-            for x in output:
-                for y in x:
-                    for z in y:
-                        finalImage.append(z)
-            self._processedImage.publish(finalImage)#might need different message type because i think this will have color
+
             self._LandmineDetected.publish(True)
+            
         else:
             self._LandmineDetected.publish(False)
+        output = np.uint8(output)
+        finalImage = []
+        for x in output:
+            for y in x:
+                for z in y:
+                    finalImage.append(z)
+        self._processedImage.publish(
+            finalImage)  # might need different message type because i think this will have color
 
 
 if __name__ == '__main__':
