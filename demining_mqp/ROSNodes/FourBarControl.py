@@ -17,7 +17,7 @@ class fourbar:
         self.MotorSpeedPin = 16
         self.MotorDirPin = 17
         GPIO.setmode(GPIO.Board)
-        GPIO.setup(self.upPin, GPIO.IN)  # need to pick a pin
+        GPIO.setup(self.upPin, GPIO.IN)  # need to pick a pinbases
         GPIO.setup(self.downPin, GPIO.IN)  # need to pick a pin
 
     def checkPins(self):
