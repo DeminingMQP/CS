@@ -14,6 +14,7 @@ class IRCam:
     def __init__(self):
         self._receivedImage = rospy.Publisher('/RawIRImage', image, queue_size=5)
         self.last_nr = None
+        print "started"
 
     def capture(self):
         with Lepton("/dev/spidev0.0") as l:
