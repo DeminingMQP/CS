@@ -12,7 +12,7 @@ class IRCamView:
 
     def showimage(self, data):
         pic = data
-        reconstruct = np.zeros((60, 80, 1), dtype=np.uint8)
+        reconstruct = np.zeros((60, 80, 1), dtype=np.uint16)
 
         index = 0
         for x in range(0, 60):

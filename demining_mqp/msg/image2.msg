@@ -1,2 +1,2 @@
-demining_mqp/image[] image
+uint16[] data
 
