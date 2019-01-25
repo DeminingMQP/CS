@@ -1,1 +1,1 @@
-uint8[] image
+uint8[] data

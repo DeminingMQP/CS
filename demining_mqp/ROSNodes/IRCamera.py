@@ -5,11 +5,12 @@ import cv2
 from pylepton import Lepton
 import time
 from demining_mqp.msg import *
+from rospy.numpy_msg import *
 
 
 class IRCam:
     def __init__(self):
-        self._receivedImage = rospy.Publisher('/RawIRImage', image3, queue_size=5)
+        self._receivedImage = rospy.Publisher('/RawIRImage', numpy_msg(image), queue_size=5)
         self.last_nr = None
 
     def capture(self):
