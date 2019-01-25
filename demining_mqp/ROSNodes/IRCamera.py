@@ -25,12 +25,12 @@ class IRCam:
                 np.right_shift(lepton_buf, 8, lepton_buf)
                 lepton_buf = np.uint8(lepton_buf)
                 finalImage = image()
-                index = 0
+                temp = []
                 for x in lepton_buf:
                     for y in x:
                         for z in y:
-                            finalImage.data[index] = z
-                            index = index +1
+                            temp.append(z)
+                finalImage.data = temp
                 print(finalImage)
                 self._receivedImage.publish(finalImage)
 
