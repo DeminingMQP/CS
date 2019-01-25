@@ -6,12 +6,13 @@ from pylepton import Lepton
 import time
 from demining_mqp.msg import *
 from rospy.numpy_msg import *
+from std_msgs import *
 
 
 
 class IRCam:
     def __init__(self):
-        self._receivedImage = rospy.Publisher('/RawIRImage', image, queue_size=5)
+        self._receivedImage = rospy.Publisher('/RawIRImage', int, queue_size=5)
         self.last_nr = None
 
     def capture(self):
@@ -24,13 +25,12 @@ class IRCam:
                 cv2.normalize(lepton_buf, lepton_buf, 0, 65535, cv2.NORM_MINMAX)
                 np.right_shift(lepton_buf, 8, lepton_buf)
                 lepton_buf = np.uint8(lepton_buf)
-                finalImage = image()
-                temp = []
+                finalImage = []
+
                 for x in lepton_buf:
                     for y in x:
                         for z in y:
-                            temp.append(z)
-                finalImage.data = temp
+                            finalImage.append(z)
 
                 self._receivedImage.publish(finalImage)
 
