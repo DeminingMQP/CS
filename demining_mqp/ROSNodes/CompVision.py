@@ -29,7 +29,7 @@ class CompVisionNode:
 
         output = reconstruct.copy()
         #output = cv2.cvtColor(output, cv2.COLOR_GRAY2RGB)
-        circles = cv2.HoughCircles(reconstruct, cv2.HOUGH_GRADIENT, 1.2, 100)  # last arg is pixels
+        circles = cv2.HoughCircles(reconstruct, cv2.HOUGH_GRADIENT, 1.2, 20)  # last arg is pixels
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
             for (x, y, r) in circles:
