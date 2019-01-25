@@ -8,6 +8,7 @@ from demining_mqp.msg import *
 from rospy.numpy_msg import *
 
 
+
 class IRCam:
     def __init__(self):
         self._receivedImage = rospy.Publisher('/RawIRImage', image, queue_size=5)
@@ -23,11 +24,11 @@ class IRCam:
                 cv2.normalize(lepton_buf, lepton_buf, 0, 65535, cv2.NORM_MINMAX)
                 np.right_shift(lepton_buf, 8, lepton_buf)
                 lepton_buf = np.uint8(lepton_buf)
-                finalImage = []
+                finalImage = image
                 for x in lepton_buf:
                     for y in x:
                         for z in y:
-                            finalImage.append(z)
+                            finalImage.data.append(z)
                 print(finalImage)
                 self._receivedImage.publish(finalImage)
 
