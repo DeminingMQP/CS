@@ -21,8 +21,8 @@ class CompVisionNode:
         reconstruct = np.zeros((60, 80, 1), dtype=np.uint8)
 
         index = 0
-        for x in range (0,80):
-            for y in range(0,60):
+        for x in range (0,60):
+            for y in range(0,80):
                 reconstruct[x][y][0] = ord(gray.data[index])
                 index = index + 1
         print "Reconstructed image"
