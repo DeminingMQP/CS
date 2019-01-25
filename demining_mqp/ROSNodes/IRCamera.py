@@ -44,4 +44,5 @@ if __name__ == '__main__':
 
     while not rospy.is_shutdown():
         time.sleep(.1)
+        print("Calling Capture")
         IRCam.capture()
