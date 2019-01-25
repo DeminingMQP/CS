@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 import rospy
 import cv2
 from demining_mqp.msg import*
