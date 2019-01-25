@@ -25,7 +25,7 @@ class CompVisionNode:
             for y in range(0,80):
                 reconstruct[x][y][0] = ord(gray.data[index])
                 index = index + 1
-        print "Reconstructed image"
+        #print "Reconstructed image"
 
         output = reconstruct.copy()
         circles = cv2.HoughCircles(reconstruct, cv2.HOUGH_GRADIENT, 1.2, 100)  # last arg is pixels
@@ -36,6 +36,7 @@ class CompVisionNode:
                 cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
             self._LandmineDetected.publish(True)
+            print "Landmine Detected"
 
         else:
             self._LandmineDetected.publish(False)

@@ -20,7 +20,7 @@ class IRCam:
         with Lepton("/dev/spidev0.0") as l:
             lepton_buf = np.zeros((60, 80, 1), dtype=np.uint16)
             last_nr = 0
-            print "Getting Image"
+            #print "Getting Image"
             _, nr = l.capture(lepton_buf)
             print "got image"
             if nr != self.last_nr:
