@@ -18,9 +18,6 @@ class CompVisionNode:
 
         # must be gray-scale image which it should be from the camera
         gray = data  # make this equal to the image from the camera
-        print ord(gray.data[0])
-        print ord(gray.data[1])
-        print "test"
         reconstruct = np.zeros((60, 80, 1), dtype=np.uint8)
 
         index = 0
@@ -28,7 +25,7 @@ class CompVisionNode:
             for y in range(0,60):
                 reconstruct[x][y][0] = ord(gray.data[index])
                 index = index + 1
-                print index
+        print "Reconstructed image"
 
         output = reconstruct.copy()
         circles = cv2.HoughCircles(reconstruct, cv2.cv.CV_HOUGH_GRADIENT, 1.2, 100)  # last arg is pixels
