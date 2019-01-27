@@ -5,7 +5,7 @@ import cv2
 from pylepton import Lepton
 import time
 from demining_mqp.msg import *
-from rospy.numpy_msg import *
+from demining_mqp.srv import *
 from std_msgs import *
 
 
@@ -14,6 +14,7 @@ class IRCam:
     def __init__(self):
         self._receivedImage = rospy.Publisher('/RawIRImage', image, queue_size=5)
         self.last_nr = None
+        self.iicSemId = 246
         print "started"
 
     def capture(self):
@@ -36,7 +37,30 @@ class IRCam:
                             finalImage.append(z)
 
                 self._receivedImage.publish(finalImage)
-
+    def getIICSem(self):
+        rospy.wait_for_service('IICSem')
+        response = 0
+        try:
+            getsem = rospy.ServiceProxy('IICSem', IICSemSrv)
+            response = getsem(self.iicSemId, 0)
+        except rospy.ServiceException, e:
+            print "oops, something went wrong  with the IIC sem"
+        if response.access is True:
+            return True
+        else:
+            return False
+    def returnIICSem(self):
+        rospy.wait_for_service('IICSem')
+        response = 0
+        try:
+            returnsem = rospy.ServiceProxy('IICSem', IICSemSrv)
+            response = returnsem(self.iicSemId, 1)
+        except rospy.ServiceException, e:
+            print "oops, something went wrong  with the IIC sem"
+        if response.access is True:
+            return True
+        else:
+            return False
 
 if __name__ == '__main__':
     rospy.init_node('IRCam')
@@ -45,5 +69,11 @@ if __name__ == '__main__':
 
     while not rospy.is_shutdown():
         time.sleep(.1)
+        while IRCam.getIICSem() is False:
+            rospy.sleep(0.01)
         print("Calling Capture")
         IRCam.capture()
+        if IRCam.returnIICSem() is False:
+            print "For some reason the IIC sem could not be returned"
+        else:
+            pass

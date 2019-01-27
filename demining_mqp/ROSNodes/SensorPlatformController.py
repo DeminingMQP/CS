@@ -3,6 +3,7 @@ import rospy
 import smbus
 from std_msgs.msg import Bool
 import numpy as np
+from demining_mqp.srv import *
 class sensorplatcontrol:
     def __init__(self):
         self._sendSAStatus = rospy.Publisher('/SensorArmStatus', np.uint8t, queue_size=5)# send to nav system
@@ -25,6 +26,8 @@ class sensorplatcontrol:
         self.StsMarkingLandmine = 7
         self.StsCommandUnknown = 8
         self.StsGeneralError = 9
+        self.handleID = 568
+        self.checkID = 297
 
     def sendMessage(self, msg, addr):
         self.bus.write_byte(addr, msg)
@@ -34,6 +37,9 @@ class sensorplatcontrol:
         return status
 
     def handleCommand(self, data):
+
+        while self.getIICSem(self.handleID) is False:
+            rospy.sleep(.01)
         if data is self.MsgStart:
             self.sendMessage(self.MsgStart, self.addressUno)
             self.sendMessage(self.MsgStart, self.addressMega)
@@ -62,6 +68,10 @@ class sensorplatcontrol:
             self.MarkLandmine()
         else:
             self._sendSAStatus.publish(self.StsCommandUnknown)
+        if self.returnIICSem(self.checkID) is False:
+            print "For some reason the IIC sem could not be returned"
+        else:
+            pass
 
 
     def HomeOrientation(self):
@@ -144,7 +154,30 @@ class sensorplatcontrol:
         else:
             self._sendSAStatus.publish(self.StsGeneralError)
 
-
+    def getIICSem(self, id):
+        rospy.wait_for_service('IICSem')
+        response = 0
+        try:
+            getsem = rospy.ServiceProxy('IICSem', IICSemSrv)
+            response = getsem(id, 0)
+        except rospy.ServiceException, e:
+            print "oops, something went wrong  with the IIC sem"
+        if response.access is True:
+            return True
+        else:
+            return False
+    def returnIICSem(self, id):
+        rospy.wait_for_service('IICSem')
+        response = 0
+        try:
+            returnsem = rospy.ServiceProxy('IICSem', IICSemSrv)
+            response = returnsem(id, 1)
+        except rospy.ServiceException, e:
+            print "oops, something went wrong  with the IIC sem"
+        if response.access is True:
+            return True
+        else:
+            return False
 
 if __name__ == '__main__':
     rospy.init_node('SensorPlatControl')
@@ -152,5 +185,11 @@ if __name__ == '__main__':
     rospy.sleep(1)
 
     while not rospy.is_shutdown():
+        while SensorPlatformController.getIICSem(SensorPlatformController.checkID) is False:
+            rospy.sleep(.01)
         SensorPlatformController.checkSensorArmStatus()
+        if SensorPlatformController.returnIICSem(SensorPlatformController.checkID) is False:
+            print "For some reason the IIC sem could not be returned"
+        else:
+            pass
         rospy.sleep(5)
