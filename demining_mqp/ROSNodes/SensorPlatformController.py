@@ -155,10 +155,10 @@ class sensorplatcontrol:
             self._sendSAStatus.publish(self.StsGeneralError)
 
     def getIICSem(self, id):
-        rospy.wait_for_service('IICSem')
+        rospy.wait_for_service('IICAccess')
         response = 0
         try:
-            getsem = rospy.ServiceProxy('IICSem', IICSemSrv)
+            getsem = rospy.ServiceProxy('IICAccess', IICSemSrv)
             response = getsem(id, 0)
         except rospy.ServiceException, e:
             print "oops, something went wrong  with the IIC sem"
@@ -167,10 +167,10 @@ class sensorplatcontrol:
         else:
             return False
     def returnIICSem(self, id):
-        rospy.wait_for_service('IICSem')
+        rospy.wait_for_service('IICAccess')
         response = 0
         try:
-            returnsem = rospy.ServiceProxy('IICSem', IICSemSrv)
+            returnsem = rospy.ServiceProxy('IICAccess', IICSemSrv)
             response = returnsem(id, 1)
         except rospy.ServiceException, e:
             print "oops, something went wrong  with the IIC sem"

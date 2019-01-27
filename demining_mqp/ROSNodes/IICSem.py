@@ -13,6 +13,7 @@ class iicSemaphore:
         rospy.spin()
 
     def handle_request(self, requested):
+        print "recievedRequest"
         if requested.checkinout == 0: #0 for check out
             if self.semcount == 1:
                 self.curNodeID = requested.id

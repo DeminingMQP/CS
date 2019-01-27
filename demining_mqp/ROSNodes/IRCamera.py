@@ -38,10 +38,10 @@ class IRCam:
 
                 self._receivedImage.publish(finalImage)
     def getIICSem(self):
-        rospy.wait_for_service('IICSem')
+        rospy.wait_for_service('IICAccess')
         response = 0
         try:
-            getsem = rospy.ServiceProxy('IICSem', IICSemSrv)
+            getsem = rospy.ServiceProxy('IICAccess', IICSemSrv)
             response = getsem(self.iicSemId, 0)
         except rospy.ServiceException, e:
             print "oops, something went wrong  with the IIC sem"
@@ -50,10 +50,10 @@ class IRCam:
         else:
             return False
     def returnIICSem(self):
-        rospy.wait_for_service('IICSem')
+        rospy.wait_for_service('IICAccess')
         response = 0
         try:
-            returnsem = rospy.ServiceProxy('IICSem', IICSemSrv)
+            returnsem = rospy.ServiceProxy('IICAccess', IICSemSrv)
             response = returnsem(self.iicSemId, 1)
         except rospy.ServiceException, e:
             print "oops, something went wrong  with the IIC sem"
