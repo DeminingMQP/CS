@@ -4,5 +4,7 @@
 
     <node pkg="demining_mqp" type="CompVision.py" name="CompVision" />
 
+    <node pkg="demining_mqp" type="IICSem.py" name="IICSem" />
+
 
 </launch>
