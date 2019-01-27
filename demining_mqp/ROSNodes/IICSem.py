@@ -29,6 +29,7 @@ class iicSemaphore:
                 return IICSemSrvResponse(True)
             else:
                 return IICSemSrvResponse(False)
+        print "Handled Access"
 
 if __name__ == '__main__':
     rospy.init_node('IICSem')
