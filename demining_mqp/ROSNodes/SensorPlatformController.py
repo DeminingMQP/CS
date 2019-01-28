@@ -153,7 +153,7 @@ class sensorplatcontrol:
             self._sendSAStatus.publish(self.StsErrorMotorStall)
         else:
             self._sendSAStatus.publish(self.StsGeneralError)
-
+        print "Got Status"
     def getIICSem(self, id):
         rospy.wait_for_service('IICAccess')
         response = 0
