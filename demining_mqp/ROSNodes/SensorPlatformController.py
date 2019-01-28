@@ -42,7 +42,7 @@ class sensorplatcontrol:
         while self.getIICSem(self.handleID) is False:
             rospy.sleep(.01)
         print "Got IICSem"
-        if data is self.MsgStart:
+        if data.data is self.MsgStart:
             self.sendMessage(self.MsgStart, self.addressUno)
             self.sendMessage(self.MsgStart, self.addressMega)
             rospy.sleep(1)
@@ -54,7 +54,7 @@ class sensorplatcontrol:
                 self._sendSAStatus.publish(self.StsRunning)
             else:
                 self._sendSAStatus.publish(self.StsGeneralError)
-        elif data is self.MsgStop:
+        elif data.data is self.MsgStop:
             self.sendMessage(self.MsgStop, self.addressUno)
             self.sendMessage(self.MsgStop, self.addressMega)
             rospy.sleep(1)
@@ -66,11 +66,11 @@ class sensorplatcontrol:
                 self._sendSAStatus.publish(self.StsStopped)
             else:
                 self._sendSAStatus.publish(self.StsGeneralError)
-        elif data is self.MsgZeroMetalDetector:
+        elif data.data is self.MsgZeroMetalDetector:
             self.ZeroMetalDetector()
-        elif data is self.MsgHomeOrientation:
+        elif data.data is self.MsgHomeOrientation:
             self.HomeOrientation()
-        elif data is self.MsgMarkLandmine:
+        elif data.data is self.MsgMarkLandmine:
             self.MarkLandmine()
         else:
             self._sendSAStatus.publish(self.StsCommandUnknown)
