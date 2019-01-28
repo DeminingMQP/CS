@@ -146,6 +146,8 @@ class sensorplatcontrol:
     def checkSensorArmStatus(self):
         status1 = self.retrieveStatus(self.addressUno)
         status2 = self.retrieveStatus(self.addressMega)
+        print(status1)
+        print(status2)
         if status1 is self.StsRunning and status2 is self.StsRunning:
             self._sendSAStatus.publish(self.StsRunning)
         elif status1 is self.StsStopped and status2 is self.StsStopped:
