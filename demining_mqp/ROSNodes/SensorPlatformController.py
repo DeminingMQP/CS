@@ -6,7 +6,7 @@ import numpy as np
 from demining_mqp.srv import *
 class sensorplatcontrol:
     def __init__(self):
-        self._sendSAStatus = rospy.Publisher('/SensorArmStatus', np.uint8t, queue_size=5)# send to nav system
+        self._sendSAStatus = rospy.Publisher('/SensorArmStatus', np.uint8, queue_size=5)# send to nav system
         self._receiveCommand = rospy.Subscriber('/NavCommand', Bool, self.handleCommand, queue_size=1 )
         self.bus = smbus.SMBus(1)
         self.addressUno = 0x07
