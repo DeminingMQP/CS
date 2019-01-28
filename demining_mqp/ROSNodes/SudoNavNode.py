@@ -20,4 +20,4 @@ if __name__ == '__main__':
         nav.sendmessage(1)
         rospy.sleep(5)
         nav.sendmessage(5)
-        rospy.sleep()
+        rospy.sleep(5)
