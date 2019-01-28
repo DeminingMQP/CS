@@ -12,7 +12,7 @@ class sensorplatcontrol:
         self.bus = smbus.SMBus(1)
         self.addressUno = 0x08
         self.addressMega = 0x04
-        self.MsgStart = 1
+        self.MsgStart = 6
         self.MsgZeroMetalDetector = 2
         self.MsgHomeOrientation = 3
         self.MsgMarkLandmine = 4
