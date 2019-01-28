@@ -8,7 +8,7 @@ import std_msgs
 class sensorplatcontrol:
     def __init__(self):
         self._sendSAStatus = rospy.Publisher('/SensorArmStatus', std_msgs.msg.Int8, queue_size=5)# send to nav system
-        self._receiveCommand = rospy.Subscriber('/NavCommand', Bool, self.handleCommand, queue_size=1 )
+        self._receiveCommand = rospy.Subscriber('/NavCommand', std_msgs.msg.Int8, self.handleCommand, queue_size=1 )
         self.bus = smbus.SMBus(1)
         self.addressUno = 0x07
         self.addressMega = 0x08
