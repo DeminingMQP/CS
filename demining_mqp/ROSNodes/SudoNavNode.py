@@ -21,5 +21,5 @@ if __name__ == '__main__':
         nav.sendmessage(5)
         rospy.sleep(7)
         print "Starting"
-        nav.sendmessage(6)
+        nav.sendmessage(1)
         rospy.sleep(7)
