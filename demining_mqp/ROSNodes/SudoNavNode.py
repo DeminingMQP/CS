@@ -19,7 +19,7 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         print "Stopping"
         nav.sendmessage(1)
-        rospy.sleep(5)
+        rospy.sleep(7)
         print "Starting"
         nav.sendmessage(5)
-        rospy.sleep(5)
+        rospy.sleep(7)
