@@ -27,10 +27,12 @@ class iicSemaphore:
         else:
             if requested.id == self.curNodeID:
                 self.semcount = 1
+                self.curNodeID = 0
                 return IICSemSrvResponse(True)
             else:
                 return IICSemSrvResponse(False)
         print "Handled Access"
+
 
 if __name__ == '__main__':
     rospy.init_node('IICSem')
