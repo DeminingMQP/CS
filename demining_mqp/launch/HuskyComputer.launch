@@ -1,0 +1,11 @@
+<launch>
+
+    <node pkg="demining_mqp" type="LandmineDetection.py" name="LandmineDetection" />
+
+    <node pkg="demining_mqp" type="Navigation.py" name="Navigation" />
+
+    <node pkg="demining_mqp" type="battery.py" name="LowBatteryProtocol" />
+
+
+
+</launch>
