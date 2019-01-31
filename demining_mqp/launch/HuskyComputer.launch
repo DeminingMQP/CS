@@ -6,6 +6,13 @@
 
     <node pkg="demining_mqp" type="battery.py" name="LowBatteryProtocol" />
 
+    <include file=" $(find sweep-ros)/launch/sweep2scan.launch.xml">
+
+    </include>
+
+    <include file=" $(find husky_navigation)/launch/move_base.launch"></include>
+
+
 
 
 </launch>
