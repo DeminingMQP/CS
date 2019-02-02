@@ -14,9 +14,9 @@ class landmineDet:
         self._receiveIRData = rospy.Subscriber('/IRLandmineDet', Bool, self.updateIRData, queue_size=1 )
         self.currentIRReadings = False
         GPIO.setmode(GPIO.Board)
-        GPIO.setup(12, GPIO.IN) # need to pick a pin
+        GPIO.setup(7, GPIO.IN)
     def checkMine(self):
-        if GPIO.input(12):
+        if GPIO.input(7):
             if self.currentIRReadings is True:
                 self._sendLandmineStatus.publish(3)
             else:

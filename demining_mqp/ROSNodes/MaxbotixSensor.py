@@ -11,8 +11,8 @@ class maxbotix:
     def __init__(self):
         self._sendSensorData = rospy.Publisher('/Maxbotix', LaserScan, queue_size=5)  # send to nav system
         self._getsliderpos = rospy.Subscriber('/sliderPos', sliderposition, self.sliderCallback, queue_size=1)
-        self.risingPin = 10
-        self.fallingPin = 11
+        self.risingPin = 22
+        self.fallingPin = 26
         GPIO.setmode(GPIO.BOARD)
 
         self.riseCallback = GPIO.add_event_detect(self.risingPin, GPIO.RISING, self.risinghandle())

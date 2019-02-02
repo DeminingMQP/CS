@@ -11,11 +11,16 @@ class fourbar:
         self._sendFourBarData = rospy.Publisher('/FourBarPos', fourbarposition,
                                                 queue_size=5)  # send to nav system with a new message type
         self._sendObstacle = rospy.Publisher('/SteepSlope', Bool, queue_size=1)
-        self.upPin = 13
-        self.downPin = 14
-        self.EncPin = 15
-        self.MotorSpeedPin = 16
-        self.MotorDirPin = 17
+        self.upPin = 12
+        self.downPin = 11
+        self.Motor1EncPin1 = 15
+        self.Motor1EncPin2 = 18
+        self.Motor1SpeedPin = 16
+        self.Motor1DirPin = 13
+        self.Motor2EncPin1 = 31
+        self.Motor2EncPin2 = 33
+        self.Motor2SpeedPin = 32
+        self.Motor2DirPin = 29
         GPIO.setmode(GPIO.Board)
         GPIO.setup(self.upPin, GPIO.IN)  # need to pick a pinbases
         GPIO.setup(self.downPin, GPIO.IN)  # need to pick a pin
