@@ -1,0 +1,6 @@
+Run tester.py(must use python3)
+open a web browser and go to http://127.0.0.1:5000/
+Drag the red cursor to define the minefield
+Drag the flag to define the start/charge location (the third cursor doesn't currently matter)
+Press send data
+Another window should open simulating the robopt scaning the minefield
