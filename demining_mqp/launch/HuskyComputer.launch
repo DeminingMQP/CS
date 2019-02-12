@@ -24,8 +24,7 @@
             polling_timeout: 10.0
         </rosparam>
     </node>
-
-   <arg name="multimaster" default="$(optenv ROBOT_MULTIMASTER false)"/>
+<arg name="multimaster" default="$(optenv ROBOT_MULTIMASTER false)"/>
   <arg name="simulation" default="$(optenv ROBOT_SIMULATION false)"/>
   <arg name="robot_namespace" default="$(optenv ROBOT_NAMESPACE robot)"/>
 
