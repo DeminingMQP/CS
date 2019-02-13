@@ -7,7 +7,7 @@ from demining_mqp.msg import*
 
 
 class FourBarPosition:
-    def __init__(self, height, mdx, mdz, length, space):
+    def __init__(self, height, mdx, mdz, length, space, baseH):
         """
         Initializes the Four Bar information for calculation.  Assumes a parallelogram linkage.
         All dimensions are in inches
@@ -16,18 +16,21 @@ class FourBarPosition:
         :param mdz: Initial height of the metal detector
         :param length: the length of the driven links
         :param space: the separation between the two links
+        :param baseH: the distance from the top of the rover to the point of rotation of the bottommost link
         """
         self.height = float(height)
         self.mdx = float(mdx)
         self.mdz = float(mdz)
         self.linkLength = float(length)
         self.linkSpace = float(space)
+        self.bottomLinkH = float(baseH)
         # TODO update with actual dimensions from CAD/Assembled robot
-        self.startingAngle = 10
-        self.mdXDist = 13
-        self.mdZDist = -15
+        self.startingAngle = 0
+        self.mdXDist = 16.76
+        self.mdZDist = -15.1
         self.currentAngle = 0
-        self.roverHeight = 13.25
+        self.roverHeight = 13.75
+
 
     def calcPos(self, encoderValue):
         """
