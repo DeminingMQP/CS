@@ -18,8 +18,8 @@ class slider:
         GPIO.setup(self.RightLimitSwitch, GPIO.IN)
         GPIO.setup(self.RightLimitSwitch, GPIO.IN)
         GPIO.setup(self.MotorStallPin, GPIO.IN)
-        GPIO.setup(self.MotorDirectionPin, GPIO.OUTPUT)
-        GPIO.setup(self.MotorSpeedPin, GPIO.OUTPUT)
+        GPIO.setup(self.MotorDirectionPin, GPIO.OUT)
+        GPIO.setup(self.MotorSpeedPin, GPIO.OUT)
         self.ScanFreely = True
         self.stepCount = 0
         self.stepDir = ""
