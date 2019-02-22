@@ -21,6 +21,9 @@ class slider:
         GPIO.setup(self.MotorDirectionPin, GPIO.OUTPUT)
         GPIO.setup(self.MotorSpeedPin, GPIO.OUTPUT)
         self.ScanFreely = True
+        self.stepCount = 0
+        self.stepDir = ""
+
 
     def handleCommand(self, data):
         if data.scanFreely is True:
@@ -35,16 +38,32 @@ class slider:
     #being marked
     def scan(self):
         if(self.ScanFreely):
-            if(GPIO.input(self.RightLimitSwitch)):
-                pass#Dillon have motor switch directions appropriately and move a certain number of ticks.
-                    #also publish a ROS Message with the new data
+            # if(GPIO.input(self.RightLimitSwitch)):
+            #     pass#Dillon have motor switch directions appropriately and move a certain number of ticks.
+            #         #also publish a ROS Message with the new data
+            #
+            # elif (GPIO.input(self.LeftLimitSwitch)):
+            #     pass
+            # else:
+            if(self.stepCount == 0):
+                GPIO.output(self.MotorDirectionPin, GPIO.HIGH)
+                self.stepDir = "left"
+            elif(self.stepCount == 20):
+                GPIO.output(self.MotorDirectionPin, GPIO.LOW)
+                self.stepDir = "right"
 
-            elif (GPIO.input(self.LeftLimitSwitch)):
-                pass
-            else:
-                pass
+            for x in range(0, 5):
+                GPIO.output(self.MotorSpeedPin, GPIO.HIGH)
+                rospy.sleep(.001)
+                GPIO.output(self.MotorSpeedPin, GPIO.LOW)
+                rospy.sleep(.001)
+                if(self.stepDir == "left"):
+                    self.stepCount += 1
+                elif(self.stepDir == "right"):
+                    self.stepCount -= 1
+
             #have arm move a certain number of steps and publish position
-        self._sendSliderPos.publish(1,1) #example of publishing message
+        self._sendSliderPos.publish(self, self.stepCount, self.stepDir) #example of publishing message
 
 if __name__ == '__main__':
     rospy.init_node('SliderControl')
