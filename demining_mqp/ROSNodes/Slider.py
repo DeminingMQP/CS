@@ -7,7 +7,7 @@ from demining_mqp.msg import*
 class slider:
     def __init__(self):
         self._sendSliderPos = rospy.Publisher('/sliderPos', sliderposition, queue_size=1)# need to make message type
-        self._receiveCommand = rospy.Subscriber('/sliderCommand', slidercommand, self.handleCommand(), queue_size=5)#need to make message type
+        self._receiveCommand = rospy.Subscriber('/sliderCommand', slidercommand, self.handleCommand(), queue_size=4)#need to make message type
         self.LeftLimitSwitchPin = 40
         self.RightLimitSwitch = 38
         self.MotorDirectionPin = 36
