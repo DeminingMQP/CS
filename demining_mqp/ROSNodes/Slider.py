@@ -8,16 +8,16 @@ class slider:
     def __init__(self):
         self._sendSliderPos = rospy.Publisher('/sliderPos', sliderposition, queue_size=1)# need to make message type
         self._receiveCommand = rospy.Subscriber('/sliderCommand', slidercommand, self.handleCommand, queue_size=4)#need to make message type
-        self.LeftLimitSwitchPin = 40
-        self.RightLimitSwitch = 38
+        #self.LeftLimitSwitchPin = 40
+        #self.RightLimitSwitch = 38
         self.MotorDirectionPin = 36
         self.MotorSpeedPin = 37
-        self.MotorStallPin = 20
+        #self.MotorStallPin = 20
         self.CurrentMotorDirection = 1 # 0 for left, 1 for right? whatever you want
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.RightLimitSwitch, GPIO.IN)
-        GPIO.setup(self.LeftLimitSwitchPin, GPIO.IN)
-        GPIO.setup(self.MotorStallPin, GPIO.IN)
+        #GPIO.setup(self.RightLimitSwitch, GPIO.IN)
+        #GPIO.setup(self.LeftLimitSwitchPin, GPIO.IN)
+        #GPIO.setup(self.MotorStallPin, GPIO.IN)
         GPIO.setup(self.MotorDirectionPin, GPIO.OUT)
         GPIO.setup(self.MotorSpeedPin, GPIO.OUT)
         self.ScanFreely = True
