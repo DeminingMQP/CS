@@ -16,7 +16,7 @@ class slider:
         self.CurrentMotorDirection = 1 # 0 for left, 1 for right? whatever you want
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.RightLimitSwitch, GPIO.IN)
-        GPIO.setup(self.RightLimitSwitch, GPIO.IN)
+        GPIO.setup(self.LeftLimitSwitchPin, GPIO.IN)
         GPIO.setup(self.MotorStallPin, GPIO.IN)
         GPIO.setup(self.MotorDirectionPin, GPIO.OUT)
         GPIO.setup(self.MotorSpeedPin, GPIO.OUT)
@@ -63,7 +63,7 @@ class slider:
                     self.stepCount -= 1
 
             #have arm move a certain number of steps and publish position
-        self._sendSliderPos.publish(self, self.stepCount, self.stepDir) #example of publishing message
+        #self._sendSliderPos.publish(self, self.stepCount, self.stepDir) #example of publishing message
 
 if __name__ == '__main__':
     rospy.init_node('SliderControl')
