@@ -14,7 +14,7 @@ class slider:
         self.MotorSpeedPin = 37
         #self.MotorStallPin = 20
         self.CurrentMotorDirection = 1 # 0 for left, 1 for right? whatever you want
-        GPIO.setmode(GPIO.Board)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.RightLimitSwitch, GPIO.IN)
         GPIO.setup(self.RightLimitSwitch, GPIO.IN)
         GPIO.setup(self.MotorStallPin, GPIO.IN)
