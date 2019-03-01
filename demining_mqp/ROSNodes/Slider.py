@@ -82,10 +82,15 @@ class slider:
     #being marked
     def scan(self):
         if(self.ScanFreely):
+            print "scanning"
             if(GPIO.input(self.RightLimitSwitchPin) == GPIO.LOW):
+                print "!!!!!!!right limit switch reached"
                 self.CurrentMotorDirection = 1
+                GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
             elif(GPIO.input(self.LeftLimitSwitchPin) == GPIO.LOW):
+                print "!!!!!!!left limit switch reached"
                 self.CurrentMotorDirection = 0
+                GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
                 #Dillon have motor switch directions appropriately and move a certain number of ticks.
                 #also publish a ROS Message with the new data
 
@@ -99,11 +104,16 @@ class slider:
                 self.stepCount += 1
 
             if(self.stepCount == self.leftBound):
+                print "left bound reached"
                 self.CurrentMotorDirection = 0
+                GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
             elif(self.stepCount == self.rightBound):
+                print "right bound reached"
                 self.CurrentMotorDirection = 1
+                GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
 
             if(GPIO.input(self.RightLimitSwitchPin) == GPIO.LOW and GPIO.input(self.LeftLimitSwitchPin) == GPIO.LOW):
+                print "both switches triggered"
                 self.ScanFreely = not self.ScanFreely
 
 
