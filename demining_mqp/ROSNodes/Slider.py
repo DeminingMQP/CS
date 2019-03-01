@@ -112,9 +112,10 @@ class slider:
                 self.CurrentMotorDirection = 1
                 GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
 
-            if(GPIO.input(self.RightLimitSwitchPin) == GPIO.LOW and GPIO.input(self.LeftLimitSwitchPin) == GPIO.LOW):
-                print "both switches triggered"
-                self.ScanFreely = not self.ScanFreely
+        if(GPIO.input(self.RightLimitSwitchPin) == GPIO.LOW and GPIO.input(self.LeftLimitSwitchPin) == GPIO.LOW):
+            print "both switches triggered"
+            self.ScanFreely = not self.ScanFreely
+            rospy.sleep(2)
 
 
             #have arm move a certain number of steps and publish position
