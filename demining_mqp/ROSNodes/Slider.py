@@ -127,5 +127,4 @@ if __name__ == '__main__':
     sliderControl.zero()
 
     while not rospy.is_shutdown():
-        rospy.sleep(0.02)
         sliderControl.scan()
