@@ -36,7 +36,8 @@ class slider:
             rospy.sleep(self.speed)
             GPIO.output(self.MotorSpeedPin, GPIO.LOW)
             rospy.sleep(self.speed)
-
+            print "Homing Left"
+        print "Button Pressed"
         self.totalStepCount = 0
         self.CurrentMotorDirection = not self.CurrentMotorDirection
         rospy.sleep(.01)
@@ -47,7 +48,8 @@ class slider:
             GPIO.output(self.MotorSpeedPin, GPIO.LOW)
             rospy.sleep(self.speed)
             self.totalStepCount += 1
-
+            print "Homing Right"
+        print "Button Pressed"
         self.CurrentMotorDirection = not self.CurrentMotorDirection
         self.stepCount = self.totalStepCount
         self.leftBound = 0 + 100
@@ -60,9 +62,10 @@ class slider:
             GPIO.output(self.MotorSpeedPin, GPIO.LOW)
             rospy.sleep(self.speed)
             self.stepCount -= 1
+            print "Returning to leftbound"
 
         self.CurrentMotorDirection = not self.CurrentMotorDirection
-
+        print "Homing Done"
     def handleCommand(self, data):
         if data.scanFreely is True:
             self.ScanFreely = True
