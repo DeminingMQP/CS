@@ -69,6 +69,8 @@ class slider:
         self.CurrentMotorDirection = 0
         GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
         print "Homing Done"
+
+
     def handleCommand(self, data):
         if data.scanFreely is True:
             self.ScanFreely = True
