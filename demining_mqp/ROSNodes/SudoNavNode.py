@@ -34,3 +34,4 @@ if __name__ == '__main__':
         rospy.sleep(20)
         print "Starting"
         nav.sendmessage(nav.MsgRetractPaint, True)
+        rospy.sleep(10)
