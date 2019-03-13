@@ -15,8 +15,10 @@ class sensorplatcontrol:
         self.MsgStart = 1
         self.MsgZeroMetalDetector = 2
         self.MsgHomeOrientation = 3
-        self.MsgMarkLandmine = 4
+        self.MsgMarkLandmine = 7
         self.MsgStop = 5
+        self.MsgExtendPaint = 6
+        self.MsgRetractPaint = 4
         self.StsRunning = 0
         self.StsStopped = 1
         self.StsZeroingMetalMD = 2
@@ -26,7 +28,10 @@ class sensorplatcontrol:
         self.StsErrorMotorStall = 6
         self.StsMarkingLandmine = 7
         self.StsCommandUnknown = 8
-        self.StsGeneralError = 9
+        self.StsSprayingPaint = 9
+        self.StsExtendingPaint = 10
+        self.StsRetractingPaint = 11
+        self.StsGeneralError = 12
         self.handleID = 568
         self.checkID = 297
 
@@ -72,6 +77,11 @@ class sensorplatcontrol:
             self.HomeOrientation()
         elif data.data is self.MsgMarkLandmine:
             self.MarkLandmine()
+        elif data.data is self.MsgExtendPaint:
+            self.ExtendPaint()
+        elif data.data is self.MsgRetractPaint:
+            self.RetractPaint()
+
         else:
             self._sendSAStatus.publish(self.StsCommandUnknown)
 
@@ -80,6 +90,22 @@ class sensorplatcontrol:
         else:
             pass
 
+    def ExtendPaint(self):
+        self.sendMessage(self.MsgExtendPaint, self.addressMega)
+        paintExtended = False
+        while paintExtended is False:
+            if self.retrieveStatus(self.addressMega) is self.StsSprayingPaint:
+                paintExtended = True
+            else:
+                rospy.sleep(1)
+    def RetractPaint(self):
+        self.sendMessage(self.MsgRetractPaint, self.addressMega)
+        paintRetracted = False
+        while paintRetracted is False:
+            if self.retrieveStatus(self.addressMega) is self.StsRunning:
+                paintRetracted = True
+            else:
+                rospy.sleep(1)
 
     def HomeOrientation(self):
         self.sendMessage(self.MsgHomeOrientation, self.addressMega)
@@ -194,6 +220,7 @@ if __name__ == '__main__':
     rospy.sleep(1)
 
     while not rospy.is_shutdown():
+        print("Checking Arduinos")
         while SensorPlatformController.getIICSem(SensorPlatformController.checkID) is False:
             rospy.sleep(.01)
         SensorPlatformController.checkSensorArmStatus()
