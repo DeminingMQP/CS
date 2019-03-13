@@ -8,10 +8,11 @@ from demining_mqp.msg import*
 
 
 class fourbar:
-    UP = True
-    DOWN = False
 
     def __init__(self):
+        self.UP = True
+        self.DOWN = False
+        self.STOPPED = 2
         self._sendFourBarData = rospy.Publisher('/FourBarPos', fourbarposition,
                                                 queue_size=5)
         self.metalDetectorListener = rospy.Subscriber('/calibrate', bool, self.calibrateCallback)
@@ -59,12 +60,12 @@ class fourbar:
         if abs(m1Enc - m2Enc) > tolerance:
             if m2Enc > m1Enc:
                 self.pwm2.stop()
-                GPIO.output(self.Motor1DirPin, UP)
+                GPIO.output(self.Motor1DirPin, self.UP)
                 self.pwm1.ChangeDutyCycle(50)
                 self.checkAlign()
             elif m1Enc > m2Enc:
                 self.pwm1.stop()
-                GPIO.output(self.Motor2DirPin, UP)
+                GPIO.output(self.Motor2DirPin, self.UP)
                 self.pwm2.ChangeDutyCycle(50)
                 self.checkAlign()
 
@@ -76,18 +77,19 @@ class fourbar:
             self.pwm1.stop()
             self.pwm2.stop()
         elif upPin:
-            self.m1dir = UP
+            self.m1dir = self.UP
             GPIO.output(self.Motor1DirPin, self.m1dir)
             GPIO.output(self.Motor2DirPin, not self.m1dir)
             self.pwm1.ChangeDutyCycle(50)
             self.pwm2.ChangeDutyCycle(50)
         elif downPin:
-            self.m1dir = DOWN
+            self.m1dir = self.DOWN
             GPIO.output(self.Motor1DirPin, self.m1dir)
             GPIO.output(self.Motor2DirPin, not self.m1dir)
             self.pwm1.ChangeDutyCycle(50)
             self.pwm2.ChangeDutyCycle(50)
         else:
+            self.m1dir = self.STOPPED
             self.pwm1.stop()
             self.pqm2.stop()
         self.fbp.calcPos(self.m1e1Value)
@@ -107,6 +109,12 @@ class fourbar:
         self.m2e2Value += self.m2dir * 1
 
     def calibrateCallback(self):
+
+        #waits for sensor arm to report it is at the appropriate height
+        #then sets encoders to zero.
+        #assumes robot is on flat ground!
+        while self.m1dir is not self.STOPPED:
+            self.checkPins()
         # set the encoder values to 0 when calibrate message is received
         self.m1e1Value = 0
         self.m1e2Value = 0
