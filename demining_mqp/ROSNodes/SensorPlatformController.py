@@ -50,27 +50,27 @@ class sensorplatcontrol:
         if data.data is self.MsgStart:
             self.sendMessage(self.MsgStart, self.addressUno)
             self.sendMessage(self.MsgStart, self.addressMega)
-            #rospy.sleep(1)
-            #status1 = self.retrieveStatus(self.addressUno)
-            #status2 = self.retrieveStatus(self.addressMega)
-            #print(status1)
-            #print(status2)
-            #if status1 is self.StsRunning and status2 is self.StsRunning:
-             #   self._sendSAStatus.publish(self.StsRunning)
-            #else:
-             #   self._sendSAStatus.publish(self.StsGeneralError)
+            rospy.sleep(1)
+            status1 = self.retrieveStatus(self.addressUno)
+            status2 = self.retrieveStatus(self.addressMega)
+            print(status1)
+            print(status2)
+            if status1 is self.StsRunning and status2 is self.StsRunning:
+                self._sendSAStatus.publish(self.StsRunning)
+            else:
+                self._sendSAStatus.publish(self.StsGeneralError)
         elif data.data is self.MsgStop:
             self.sendMessage(self.MsgStop, self.addressUno)
             self.sendMessage(self.MsgStop, self.addressMega)
-           # rospy.sleep(1)
-           # status1 = self.retrieveStatus(self.addressUno)
-           # status2 = self.retrieveStatus(self.addressMega)
-           # print(status1)
-           # print(status2)
-           # if status1 is self.StsStopped and status2 is self.StsStopped:
-           #     self._sendSAStatus.publish(self.StsStopped)
-           # else:
-           #     self._sendSAStatus.publish(self.StsGeneralError)
+            rospy.sleep(1)
+            status1 = self.retrieveStatus(self.addressUno)
+            status2 = self.retrieveStatus(self.addressMega)
+            print(status1)
+            print(status2)
+            if status1 is self.StsStopped and status2 is self.StsStopped:
+                self._sendSAStatus.publish(self.StsStopped)
+            else:
+                self._sendSAStatus.publish(self.StsGeneralError)
         elif data.data is self.MsgZeroMetalDetector:
             self.ZeroMetalDetector()
         elif data.data is self.MsgHomeOrientation:
@@ -94,7 +94,9 @@ class sensorplatcontrol:
         self.sendMessage(self.MsgExtendPaint, self.addressMega)
         paintExtended = False
         while paintExtended is False:
-            if self.retrieveStatus(self.addressMega) is self.StsSprayingPaint:
+            stat = self.retrieveStatus(self.addressMega)
+            self._sendSAStatus.publish(stat)
+            if stat is self.StsSprayingPaint:
                 paintExtended = True
             else:
                 rospy.sleep(1)
@@ -102,7 +104,9 @@ class sensorplatcontrol:
         self.sendMessage(self.MsgRetractPaint, self.addressMega)
         paintRetracted = False
         while paintRetracted is False:
-            if self.retrieveStatus(self.addressMega) is self.StsRunning:
+            stat = self.retrieveStatus(self.addressMega)
+            self._sendSAStatus.publish(stat)
+            if stat is self.StsRunning:
                 paintRetracted = True
             else:
                 rospy.sleep(1)
