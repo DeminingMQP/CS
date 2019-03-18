@@ -15,10 +15,10 @@ class sensorplatcontrol:
         self.MsgStart = 1
         self.MsgZeroMetalDetector = 2
         self.MsgHomeOrientation = 3
-        self.MsgMarkLandmine = 7
+        self.MsgMarkLandmine = 4
         self.MsgStop = 5
         self.MsgExtendPaint = 6
-        self.MsgRetractPaint = 4
+        self.MsgRetractPaint = 7
         self.StsRunning = 0
         self.StsStopped = 1
         self.StsZeroingMetalMD = 2
