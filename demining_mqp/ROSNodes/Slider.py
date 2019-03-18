@@ -13,7 +13,7 @@ class slider:
         self.MotorDirectionPin = 36
         self.MotorSpeedPin = 37
         #self.MotorStallPin = 20
-        self.CurrentMotorDirection = 1 # 0 for left, 1 for right? whatever you want
+        self.CurrentMotorDirection = 1 # 0 for right, 1 for left
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(self.RightLimitSwitchPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(self.LeftLimitSwitchPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -76,15 +76,59 @@ class slider:
             self.ScanFreely = True
         else:
             self.ScanFreely = False
-        if data.motorstep is not 0:
-            pass
-            #dillon make this move to the motorstep position in the message
+            if data.motorstep is not -1:
+                self.moveToStep(data.motorstep)
 
-    #needs to be able to stop/start slider and command slider to move to a position and wait there like when a mine is
-    #being marked
+    def moveToStep(self, motorStep):
+        if(self.stepCount <= motorStep):
+            self.CurrentMotorDirection = 0
+            GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
+        elif(self.stepCount > motorStep):
+            self.CurrentMotorDirection = 1
+            GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
+
+        rospy.sleep(1)
+
+        while not(self.stepCount == motorStep):
+            if (GPIO.input(self.RightLimitSwitchPin) == GPIO.LOW):
+                print "!!!!!!!right limit switch reached"
+                self.CurrentMotorDirection = 1
+                GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
+                motorStep = self.stepCount
+            elif (GPIO.input(self.LeftLimitSwitchPin) == GPIO.LOW):
+                print "!!!!!!!left limit switch reached"
+                self.CurrentMotorDirection = 0
+                GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
+                motorStep = self.stepCount
+
+            GPIO.output(self.MotorSpeedPin, GPIO.HIGH)
+            rospy.sleep(self.speed)
+            GPIO.output(self.MotorSpeedPin, GPIO.LOW)
+            rospy.sleep(self.speed)
+
+            if (self.CurrentMotorDirection == 1):
+                self.stepCount -= 1
+            elif (self.CurrentMotorDirection == 0):
+                self.stepCount += 1
+
+            if (self.stepCount == self.leftBound):
+                print "left bound reached"
+                self.CurrentMotorDirection = 0
+                GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
+                motorStep = self.stepCount
+            elif (self.stepCount == self.rightBound):
+                print "right bound reached"
+                self.CurrentMotorDirection = 1
+                GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
+                motorStep = self.stepCount
+
+        self._sendSliderPos.publish(self.stepCount, self.stepDir, self.leftBound, self.rightBound)
+        
+
     def scan(self):
         if(self.ScanFreely):
             print "scanning"
+            self._sendSliderPos.publish(self.stepCount, self.stepDir, self.leftBound, self.rightBound)
             if(GPIO.input(self.RightLimitSwitchPin) == GPIO.LOW):
                 print "!!!!!!!right limit switch reached"
                 self.CurrentMotorDirection = 1
@@ -93,13 +137,12 @@ class slider:
                 print "!!!!!!!left limit switch reached"
                 self.CurrentMotorDirection = 0
                 GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
-                #Dillon have motor switch directions appropriately and move a certain number of ticks.
-                #also publish a ROS Message with the new data
 
             GPIO.output(self.MotorSpeedPin, GPIO.HIGH)
             rospy.sleep(self.speed)
             GPIO.output(self.MotorSpeedPin, GPIO.LOW)
             rospy.sleep(self.speed)
+
             if (self.CurrentMotorDirection == 1):
                 self.stepCount -= 1
             elif (self.CurrentMotorDirection == 0):
