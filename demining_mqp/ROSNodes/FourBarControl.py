@@ -3,7 +3,7 @@ import rospy, math
 from std_msgs.msg import Bool
 import numpy as np
 import RPi.GPIO as GPIO
-import FourBarPosition
+import fourbarposition
 from demining_mqp.msg import*
 
 
