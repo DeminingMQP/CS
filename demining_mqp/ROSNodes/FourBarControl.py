@@ -48,7 +48,7 @@ class fourbar:
         self.m2e1Value = 0
         self.m2e2Value = 0
         self.m1dir = 1
-        self.fbp = FourBarPosition(8, 40.76, 14.83, 24, 5, 3)
+        self.fbp = fourbarposition(8, 40.76, 14.83, 24, 5, 3)
 
     def checkAlign(self):
         # Copy encoder values
