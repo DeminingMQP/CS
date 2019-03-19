@@ -122,13 +122,13 @@ class slider:
                 GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
                 motorStep = self.stepCount
 
-        self._sendSliderPos.publish(self.stepCount, self.stepDir, self.leftBound, self.rightBound)
+        self._sendSliderPos.publish(self.stepCount, self.CurrentMotorDirection, self.leftBound, self.rightBound)
         
 
     def scan(self):
         if(self.ScanFreely):
             print "scanning"
-            self._sendSliderPos.publish(self.stepCount, self.stepDir, self.leftBound, self.rightBound)
+            self._sendSliderPos.publish(self.stepCount, self.CurrentMotorDirection, self.leftBound, self.rightBound)
             if(GPIO.input(self.RightLimitSwitchPin) == GPIO.LOW):
                 print "!!!!!!!right limit switch reached"
                 self.CurrentMotorDirection = 1
