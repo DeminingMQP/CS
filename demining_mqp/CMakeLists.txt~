@@ -56,7 +56,6 @@ find_package(catkin REQUIRED COMPONENTS
    slidercommand.msg
    sliderposition.msg
    fourbarposition.msg
-   IMUOrientation.msg
  )
 
 ## Generate services in the 'srv' folder

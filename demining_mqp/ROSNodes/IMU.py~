@@ -56,7 +56,7 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         # Read the Euler angles for heading, roll, pitch (all in degrees).
         heading, roll, pitch = imusensor.bno.read_euler()
-        imusensor.sendData(heading,roll,pitch)
+		imusensor.sendData(heading,roll,pitch)
         # Read the calibration status, 0=uncalibrated and 3=fully calibrated.
         sys, gyro, accel, mag = imusensor.bno.get_calibration_status()
         # Print everything out.

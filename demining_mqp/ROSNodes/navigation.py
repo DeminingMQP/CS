@@ -1,0 +1,487 @@
+import rospy
+from std_msgs.msg import String
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+import time
+from geometry_msgs.msg import Point
+import sys
+import select
+from copy import deepcopy
+from demining_mqp.msg import*
+import math
+import std_msgs
+
+def updateIMUOrientation(data,args):
+    args[0] = data.heading
+    args[1] = data.roll
+    args[2] = data.pitch
+
+def readDetector(data,landmineDetected):  
+    if data ==1 or data ==3:
+        landmineDetected = True
+    else:
+        landmineDetected = False
+    
+
+def updateLocation(data,currentLocation):
+    currentLocation.x = data.x
+    currentLocation.y = data.y
+
+def updateSliderPosition(data, args):
+    args[0] = data.motorstep
+    args[1] = data.direction
+    args[2] = data.minStep
+    args[3] = data.maxStep
+
+def turnRight(vel_msg, speed):
+    vel_msg.angular.z = -speed
+    print("right")
+    return vel_msg
+
+def turnLeft(vel_msg, speed):
+    vel_msg.angular.z = speed
+    print("left")
+    return vel_msg
+
+def driveStraight(vel_msg,speed):
+    vel_msg.linear.x = speed
+    return vel_msg
+
+def fullStop(vel_msg):
+    vel_msg.linear.x = 0
+    vel_msg.linear.y = 0
+    vel_msg.linear.z = 0
+    vel_msg.angular.x = 0
+    vel_msg.angular.y = 0
+    vel_msg.angular.z = 0
+    print("stop")
+    return vel_msg
+
+def updateEnc(data, currentEnc):
+    currentEnc.x = data.pose.pose.position.x
+    currentEnc.y = data.pose.pose.position.y
+    currentEnc.z = data.pose.pose.orientation.z
+    #print(currentEnc.z)
+
+def makeGrid(currLocation,halfSizeOfRobot):
+    # 5 = unexplored
+    grid = []
+    gridLength = 14
+    gridHeight = 16
+    for index in range (0,gridLength):
+        grid.append([])
+        for index2 in range(0,gridHeight):
+            grid[index].append(5)
+    for index in range(currLocation[0]-halfSizeOfRobot,    currLocation[0]+halfSizeOfRobot+1):   
+        for index2 in range(currLocation[1]-halfSizeOfRobot,    currLocation[1]+halfSizeOfRobot+1):                       
+            grid[index][index2] = 2
+    grid[8][8] = 0
+    return grid
+
+def pickTarget(Grid,currLocation):
+    return 0
+
+def determinePath(Grid,currTarget,currLocation, halfSizeOfRobot, pathType):
+    targetDistance = 0
+    unknownWeight = 5
+    removeSpaces=[]
+    targetX = 0
+    targetY = 0
+    potentialSpaces = [{"x":currLocation[0],"y":currLocation[1],"dist":0,"route":[], "target": 0}]
+    archivedSpaces =[]
+    targetRoute = []
+    while targetRoute == []:
+        newAdditions = []
+        for potentialSpacesIndex in potentialSpaces:
+            downRoute = potentialSpacesIndex["route"][:]
+            downRoute.append(1)
+            rightRoute = potentialSpacesIndex["route"][:]
+            rightRoute.append(2)
+            upRoute = potentialSpacesIndex["route"][:]
+            upRoute.append(3)
+            leftRoute = potentialSpacesIndex["route"][:]
+            leftRoute.append(4)
+            down = {"x":potentialSpacesIndex["x"],"y": potentialSpacesIndex["y"] - 1,"dist": potentialSpacesIndex["dist"] + 1,"route": downRoute, "target": 0}
+            right = {"x":potentialSpacesIndex["x"] + 1,"y": potentialSpacesIndex["y"],"dist": potentialSpacesIndex["dist"] + 1,"route":  rightRoute, "target": 0}
+            up = {"x":potentialSpacesIndex["x"],"y": potentialSpacesIndex["y"] + 1,"dist": potentialSpacesIndex["dist"] + 1,"route":  upRoute, "target": 0}
+            left = {"x":potentialSpacesIndex["x"] - 1,"y": potentialSpacesIndex["y"],"dist": potentialSpacesIndex["dist"] + 1,"route":  leftRoute, "target": 0}
+            currentAdjacentSpaces = [down, right, left, up]
+            for index in currentAdjacentSpaces:
+                inArchive = 0
+                for archivedSpacesIndex in archivedSpaces:
+                    if archivedSpacesIndex["x"] == index["x"] and archivedSpacesIndex["y"] == index["y"]:
+                        inArchive = 1
+                if inArchive == 0:
+                    if index["x"]-halfSizeOfRobot<0 or index["y"]-halfSizeOfRobot<0 or index["x"]+halfSizeOfRobot>len(Grid) - 1 or index["y"]+halfSizeOfRobot>len(Grid[0]) - 1 or Grid[index["x"]][index["y"]] == 4 or Grid[index["x"]][index["y"]] == 3 or Grid[index["x"]][index["y"]] == 0 or Grid[index["x"]][index["y"]] == 6:
+                        index["dist"] = -1
+                    elif Grid[index["x"]][index["y"]] == 2:
+                        match = 0
+                        for index2 in newAdditions:
+                            if index2["x"] == index["x"] and index2["y"] == index["y"] and index2["dist"] > index["dist"]:
+                                index2["dist"] = index["dist"]
+                                index2["route"] = index["route"]
+                                match = 1
+                            elif index2["x"] == index["x"] and index2["y"] == index["y"] and index2["dist"] <= index["dist"]:
+                                match = 1
+                        for index2 in potentialSpaces:
+                            if index2["x"] == index["x"] and index2["y"] == index["y"] and index2["dist"] > index["dist"]:
+                                index2["dist"] = index["dist"]
+                                index2["route"] = index["route"]
+                                match = 1
+                            elif index2["x"] == index["x"] and index2["y"] == index["y"] and index2["dist"] <= index["dist"]:
+                                match = 1
+                        if match == 0:
+                            newAdditions.append(index)
+                    elif Grid[index["x"]][index["y"]] == 5:
+                        if pathType == "Frontier Path":
+                            index["target"] = 1
+                            newAdditions.append(index)
+                            #unident this
+                            """elif pathType == "Obstacle Avoidance":
+                            index["dist"] += unknownWeight-1
+                            for index2 in newAdditions:
+                                if index2["x"] == index["x"] and index2["y"] == index["y"] and index2["dist"] > index["dist"]:
+                                    index2["dist"] = index["dist"]
+                                    index2["route"] = index["route"]
+                                    match = 1
+                                elif index2["x"] == index["x"] and index2["y"] == index["y"] and index2["dist"] <= index["dist"]:
+                                    match = 1
+                            for index2 in potentialSpaces:
+                                if index2["x"] == index["x"] and index2["y"] == index["y"] and index2["dist"] > index["dist"]:
+                                    index2["dist"] = index["dist"]
+                                    index2["route"] = index["route"]
+                                    match = 1
+                                elif index2["x"] == index["x"] and index2["y"] == index["y"] and index2["dist"] <= index["dist"]:
+                                    match = 1
+                            if match == 0:
+                                newAdditions.append(index)
+                        elif pathType == "Battery":
+                            index["dist"] = -1"""
+                        else:
+                            print("Incorrect Path Type Error")
+                    else:
+                        print("Target Aquisition Error")
+                    """if goalX == index["x"] and goalY == index["y"] and (pathType == "Battery" or pathType == "Obstacle Avoidance"):
+                        index["target"] = 1"""
+                else:
+		            u=0
+                    #print("In Archive")
+            archivedSpaces.append(potentialSpacesIndex)
+            removeSpaces.append(potentialSpacesIndex)
+        for newAdditionIndex in newAdditions:
+            potentialSpaces.append(newAdditionIndex)
+        for potentialSpacesIndex in potentialSpaces:
+            if potentialSpacesIndex["target"] == 1:
+                targetRoute = potentialSpacesIndex["route"]
+                targetX = potentialSpacesIndex["x"]
+                targetY = potentialSpacesIndex["y"]
+                targetDistance = potentialSpacesIndex["dist"]
+                break
+            elif potentialSpacesIndex["dist"] == -1:
+                removeSpaces.append(potentialSpacesIndex)
+        for removeSpaceIndex in removeSpaces:
+            potentialSpaces.remove(removeSpaceIndex)
+        removeSpaces = []
+        if potentialSpaces == []:
+            return [], True
+    print("here",targetX,targetY, currLocation)
+    #time.sleep(2)
+    return(targetRoute, False)
+
+def senseMine(currDirection,halfSizeOfRobot,grid,currLocation, sliderFirstReduced, sliderLastReduced):
+    if currDirection == 1 and currLocation[1]-halfSizeOfRobot-1>0:
+        for index in range(currLocation[0]-halfSizeOfRobot + min(sliderFirstReduced,sliderLastReduced),currLocation[0]-halfSizeOfRobot + max(sliderFirstReduced,sliderLastReduced)):
+            grid[index][currLocation[1]-halfSizeOfRobot-1] = 3
+            bufferSingleSquare((index,currLocation[1]-halfSizeOfRobot-1),grid)
+    if currDirection == 2 and currLocation[0]+halfSizeOfRobot-+1<len(grid):
+        for index in range(currLocation[1]-halfSizeOfRobot + min(sliderFirstReduced,sliderLastReduced),currLocation[1]-halfSizeOfRobot + max(sliderFirstReduced,sliderLastReduced)):
+            grid[index][currLocation[0]-halfSizeOfRobot-1] = 3
+            bufferSingleSquare((index,currLocation[0]+halfSizeOfRobot+1),grid)
+    if currDirection == 3 and currLocation[1]+halfSizeOfRobot-+1<len(grid):
+        for index in range(currLocation[0]-halfSizeOfRobot + min(sliderFirstReduced,sliderLastReduced),currLocation[0]-halfSizeOfRobot + max(sliderFirstReduced,sliderLastReduced)):
+            grid[index][currLocation[1]-halfSizeOfRobot-1] = 3
+            bufferSingleSquare((index,currLocation[1]+halfSizeOfRobot+1),grid)
+    if currDirection == 4 and currLocation[0]-halfSizeOfRobot-1>0:
+        for index in range(currLocation[1]-halfSizeOfRobot + min(sliderFirstReduced,sliderLastReduced),currLocation[1]-halfSizeOfRobot + max(sliderFirstReduced,sliderLastReduced)):
+            grid[index][currLocation[0]-halfSizeOfRobot-1] = 3
+            bufferSingleSquare((index,currLocation[0]-halfSizeOfRobot-1),grid)
+
+def bufferSingleSquare(location,grid):
+    for index in range (loacation[0]-halfSizeOfRobot,loaction[0]+halfSizeOfRobot+1): 
+        for index2 in range (loacation[1]-halfSizeOfRobot,loaction[1]+halfSizeOfRobot+1):
+            if index>0 and index2>0 and index<len(grid) and index2<len(grid[0]) and (grid[index][index2]==2 or grid[index][index2]==5):
+                grid[index][index2]=6
+    return grid
+
+def establishBuffer(grid,halfSizeOfRobot):
+    for index in range (0,len(grid)):
+        for index2 in range (0,len(grid[0])):
+            if index < halfSizeOfRobot or index2 < halfSizeOfRobot or index > len(grid)-halfSizeOfRobot-1 or index2 > len(grid[0])-halfSizeOfRobot-1:
+                if grid[index][index2] == 2 or grid[index][index2] == 5:
+                    grid[index][index2] = 6
+            if grid[index][index2] == 0:
+                for index3 in range(index-halfSizeOfRobot,index+halfSizeOfRobot+1):
+                    for index4 in range(index2-halfSizeOfRobot,index2+halfSizeOfRobot+1):
+                        if index3>0 and index4>0 and index3<len(grid)-1 and index4<len(grid[0])-1:
+                            if grid[index3][index4] == 2 or grid[index3][index4] == 5:
+                                grid[index3][index4] = 6
+    return grid
+
+def main():
+    heading = 0
+    roll = 0
+    pitch = 0
+    startTurn = True
+    keyboardM = False
+    landmineDetected = False
+    sliderPosition = 0
+    sliderDirection=0
+    sliderMin = 0
+    sliderMax = 0
+    currDirection = 2 #starts facing right
+    halfSizeOfRobot = 2
+    turnTime = 0
+    newDirection = 0
+    targetPath = []
+    currTarget = (0,0)
+    currLocation = (2,2)#currently leaves 2 width order
+    grid = makeGrid(currLocation,halfSizeOfRobot)
+    grid = establishBuffer(grid,halfSizeOfRobot)
+    maxSpeed = 0.5
+    minSpeed = 0.1
+    currentLocation = Point()
+    vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+    slider_pub = rospy.Publisher('/sliderCommand',slidercommand,queue_size = 10)
+    sensorArm_pub = rospy.Publisher('/NavCommand', std_msgs.msg.Int8, queue_size=5)
+    rospy.init_node('square', anonymous=True)
+    rate = rospy.Rate(10) # 10hz
+    vel_msg = Twist()
+    vel_msg.linear.x = 0
+    vel_msg.linear.y = 0
+    vel_msg.linear.z = 0
+    vel_msg.angular.x = 0
+    vel_msg.angular.y = 0
+    vel_msg.angular.z = 0
+    XOrientation = 0
+    YOrientation = 0
+    ZOrientation = 0
+    slider_msg = slidercommand()
+    currentEnc = Point()
+    dgps_sub = rospy.Subscriber('/dgps_location',Point, updateLocation, currentLocation)
+    odom_sub = rospy.Subscriber('/husky_velocity_controller/odom',Odometry, updateEnc, currentEnc)
+    slider_sub = rospy.Subscriber('/sliderPos',sliderposition,updateSliderPosition, [sliderPosition,sliderDirection, sliderMin, sliderMax])
+    #landmineDetector_sub = rospy.Subscriber('/LandmineDetected',std_msgs.msg.Int8, readDetector, landmineDetected)
+    IMU_sub = rospy.Subscriber('/IMU',IMUOrientation,updateIMUOrientation, [XOrientation, YOrientation,ZOrientation])
+    startTime = time.time()
+    stop = False
+    mines = []
+    pauseTime = 0
+    pauseStart = -2
+    prevEnc = Point()
+    encDiff = Point()
+    stage = 0
+    targetPath, stop = determinePath(grid,(0,0),currLocation,halfSizeOfRobot, "Frontier Path")
+    case = "explore"
+    centered = False
+    left = False
+    error = False
+    while not rospy.is_shutdown():
+        try:
+            while True:
+                if error:
+                    exit(1)
+                try:
+                    if not left:
+                        if startTurn:
+                            startTurn = False
+                            targetHeading = (heading+90)%360
+                        if abs(heading-targetHeading)>5:
+                            vel_msg = turnRight(vel_msg, 0.2)
+                        else:
+                            vel_msg = fullStop(vel_msg)
+                            vel_pub.publish(vel_msg)
+                            time.sleep(2)
+                            left = True
+
+                    else:
+                        if startTurn:
+                            startTurn = False
+                            targetHeading = (heading-180)%360
+                        if abs(heading-targetHeading)<>5:
+                            vel_msg = turnLeft(vel_msg, 0.2)
+                        else:
+                            vel_msg = fullStop(vel_msg)
+                            vel_pub.publish(vel_msg)
+                            time.sleep(2)
+                    vel_pub.publish(vel_msg)
+                except KeyboardInterrupt:
+                    error = True
+                    print("ERRRRRRROROROROROR")
+                    time.sleep(2)
+                    exit(1)                
+
+            if select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
+                myInput = sys.stdin.read(1)
+                if myInput == " ":
+                    #print(currentLocation)
+                    mines.append(deepcopy(currentLocation))
+                    #print(mines)
+                    dist = 0.3
+                if myInput == "m":
+                    case = "detect mine"
+                    minePhase = "scan forward"
+                    firstSight = sliderPosition
+                    firstDirection = sliderDirection
+                    keyboardM = True
+            if case =="mark mine":
+                readyToExplore = False
+                if markPhase == "turning out":
+                    sensorArm_pub.publish(6)
+                    if sensorArmStatus == 9:
+                        markPhase="paint"
+                elif markPhase == "paint":
+                    time.sleep(2)
+                    sensorArm_pub.publish(7)
+                    markPhase = "turning in"
+                elif markphase == "turning in":
+                    if sensorArmStatus == 0:
+                        readyToExplore = True
+                if readyToExplore:
+                    case = "explore" 
+            elif case == "detect mine":           
+                if minePhase == "scan forward":
+                    if sliderPosition == firstSight + 200 and keyboardM == True:
+                        lastSight = sliderMax
+                        minePhase = "centering"
+                        keyboardM = False
+                    elif sliderDirection != firstDirection:
+                        lastSight = sliderMax
+                        minePhase = "centering"
+                    #elif not landmineDetected:
+                        #lastSight = sliderPosition
+                        #minePhase = "centering"
+                elif minePhase == "centering":
+                    center = math.floor((firstSight + lastSight)/2)
+                    slider_msg.scanFreely = False
+                    slider_msg.motorstep = center
+                    slider_pub.publish(slider_msg)
+                    if sliderPosition == center:
+                         centered = True
+                if centered:
+                    sliderFirstReduced = math.floor(((2*halfSizeOfRobot+1)/(sliderMax-sliderMin+1)) * firstSight)
+                    sliderLastReduced = math.floor(((2*halfSizeOfRobot+1)/(sliderMax-sliderMin+1)) * lastSight)
+                    senseMine(currDirection,halfSizeOfRobot,grid,currLocation,sliderFirstReduced,sliderLastReduced)
+                    targetPath, stop = determinePath(grid,(0,0),currLocation,halfSizeOfRobot, "Frontier Path")
+                    centered = False                    
+                    case ="mark mine"
+                    markPhase = "turning out"
+            elif case == "explore":
+                currTime = time.time()
+                encDiff.x = currentEnc.x - prevEnc.x
+                encDiff.y = currentEnc.y - prevEnc.y
+                encDiff.z = currentEnc.z - prevEnc.z
+                dist = math.sqrt(encDiff.x**2 + encDiff.y**2)
+                print(dist)
+                #currTarget = pickTarget(Grid, currLocation)
+                print(targetPath, currDirection)
+                if targetPath != []:
+                    if pauseTime < currTime:
+                        if ((targetPath[0]+1)%4 == currDirection%4):
+                            if startTurn:
+                                startTurn = False
+                                targetHeading = (heading+90)%360
+                            if abs(heading-targetHeading)>5:
+                                vel_msg = turnRight(vel_msg, 0.2)
+                            else:
+                                currDirection = targetPath[0]
+                                startTurn = True
+                                prevEnc = deepcopy(currentEnc)
+                                vel_msg = fullStop(vel_msg)
+                                pauseTime = currTime + 2
+                        elif ((currDirection+1)%4 == targetPath[0]%4):
+                            if startTurn:
+                                startTurn = False
+                                targetHeading = (heading-90)%360
+                            if abs(heading-targetHeading)>5:
+                                vel_msg = turnLeft(vel_msg, 0.2)
+                            else:
+                                currDirection = targetPath[0]
+                                startTurn = True
+                                prevEnc = deepcopy(currentEnc)
+                                vel_msg = fullStop(vel_msg)
+                                pauseTime = currTime + 2
+                        elif ((currDirection+2)%4 == targetPath[0]%4):
+                            if startTurn:
+                                startTurn = False
+                                targetHeading = (heading+180)%360
+                            if abs(heading-targetHeading)>5:
+                                vel_msg = turnLeft(vel_msg, 0.2)
+                            else:
+                                currDirection = targetPath[0]
+                                startTurn = True
+                                prevEnc = deepcopy(currentEnc)
+                                vel_msg = fullStop(vel_msg)
+                                pauseTime = currTime + 2
+                        if currDirection == targetPath[0]:
+                            if dist<0.2:
+                                vel_msg = driveStraight(vel_msg, 0.2)
+                            else:
+                                pauseTime = currTime + 2
+                                vel_msg = fullStop(vel_msg)
+                                prevEnc = deepcopy(currentEnc)                  
+                                if currDirection == 1:
+                                    currLocation = (currLocation[0],currLocation[1]-1)
+                                if currDirection == 2:
+                                    currLocation = (currLocation[0]+1,currLocation[1])
+                                if currDirection == 3:
+                                    currLocation = (currLocation[0],currLocation[1]+1)
+                                if currDirection == 4:
+                                    currLocation = (currLocation[0]-1,currLocation[1])
+                                targetPath, stop = determinePath(grid,(0,0),currLocation,halfSizeOfRobot, "Frontier Path")
+                                #for index in range(currLocation[0]-halfSizeOfRobot,    currLocation[0]+halfSizeOfRobot+1):   
+                                    #for index2 in range(currLocation[1]-halfSizeOfRobot,    currLocation[1]+halfSizeOfRobot+1):                       
+                                        #grid[index][index2] = 2
+                        if currDirection == 1 and currLocation[1]-halfSizeOfRobot-1>0:
+                            for index in range(currLocation[0]-halfSizeOfRobot,currLocation[0]+halfSizeOfRobot+1):
+                                if grid[index][currLocation[1]-halfSizeOfRobot-1] == 5:
+                                    grid[index][currLocation[1]-halfSizeOfRobot-1] = 2
+                        if currDirection == 2 and currLocation[0]+halfSizeOfRobot+2<len(grid):
+                            print(currLocation, len(grid))
+                            for index in range(currLocation[1]-halfSizeOfRobot,currLocation[1]+halfSizeOfRobot+1):
+                                if grid[currLocation[0]+halfSizeOfRobot+1][index] == 5:
+                                    grid[currLocation[0]+halfSizeOfRobot+1][index] = 2
+                        if currDirection == 3 and currLocation[1]+halfSizeOfRobot+2<len(grid[0]):
+                            print(currLocation, len(grid[0]))
+                            for index in range(currLocation[0]-halfSizeOfRobot,currLocation[0]+halfSizeOfRobot+1):
+                                if grid[index][currLocation[1]+halfSizeOfRobot+1] == 5:
+                                    grid[index][currLocation[1]+halfSizeOfRobot+1] = 2
+                        if currDirection == 4 and currLocation[0]-halfSizeOfRobot-1>0:
+                            for index in range(currLocation[1]-halfSizeOfRobot,currLocation[1]+halfSizeOfRobot+1):
+                                if grid[currLocation[0]-halfSizeOfRobot-1][index] == 5:
+                                    grid[currLocation[0]-halfSizeOfRobot-1][index] = 2
+                    else:
+                        vel_msg = fullStop(vel_msg)
+                if stop:
+                    vel_msg = fullStop(vel_msg)
+                    #print(mines)
+                vel_pub.publish(vel_msg)
+                rate.sleep()
+                gridNum = ["",0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5]
+                print(gridNum)
+                for line in range(0,len(grid)):
+                    print(line%10,grid[line])
+                print("Loc:",currLocation)
+        except KeyboardInterrupt:
+            #print(mines)
+            exit(1)
+        except Exception as e:
+            print("error", e)
+            time.sleep(1)
+            exit(1)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        pass
