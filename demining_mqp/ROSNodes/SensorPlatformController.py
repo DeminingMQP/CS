@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import rospy
 import smbus
-from std_msgs.msg import Bool
+from std_msgs.msg import *
 import numpy as np
 from demining_mqp.srv import *
-import std_msgs
 class sensorplatcontrol:
     def __init__(self):
         self._sendSAStatus = rospy.Publisher('/SensorArmStatus', std_msgs.msg.Int8, queue_size=5)# send to nav system
