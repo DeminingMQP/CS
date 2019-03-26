@@ -16,11 +16,13 @@ class landmineDet:
         GPIO.setup(7, GPIO.IN)
     def checkMine(self):
         if GPIO.input(7):
+            print("DetectedMetal")
             if self.currentIRReadings is True:
                 self._sendLandmineStatus.publish(3)
             else:
                 self._sendLandmineStatus.publish(1)
         else:
+            print"No Metal"
             if self.currentIRReadings is True:
                 self._sendLandmineStatus.publish(2)
             else:
