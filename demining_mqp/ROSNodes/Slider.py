@@ -80,6 +80,7 @@ class slider:
                 self.moveToStep(data.motorstep)
 
     def moveToStep(self, motorStep):
+
         if(self.stepCount <= motorStep):
             self.CurrentMotorDirection = 0
             GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)

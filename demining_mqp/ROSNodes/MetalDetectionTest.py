@@ -9,7 +9,7 @@ class TestMD:
         self._sendSAStatus = rospy.Publisher('/NavCommand', std_msgs.msg.Int8, queue_size=5)# send to SensorPlatform Control
         self._sendSliderMsg = rospy.Publisher('sliderCommand', slidercommand, queue_size=5)
         self._retrieveMD = rospy.Subscriber('/LandmineDetected', std_msgs.msg.Int8, self.saveMineDetectInfo, queue_size=5)
-        self._sendSliderPos = rospy.Subscriber('/sliderPos', sliderposition, self.saveMineDetectInfo, queue_size=1)  # need to make message type
+        self._sendSliderPos = rospy.Subscriber('/sliderPos', sliderposition, self.saveSliderData, queue_size=1)  # need to make message type
         self._retrieveStatus = rospy.Subscriber('/SensorArmStatus', std_msgs.msg.Int8, self.SaveSensorArmStatus, queue_size=5)  # send to nav system
         self.MsgStart = 1
         self.MsgZeroMetalDetector = 2

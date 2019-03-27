@@ -12,7 +12,7 @@ class landmineDet:
         self._sendLandmineStatus = rospy.Publisher('/LandmineDetected', std_msgs.msg.Int8, queue_size=5)# send to nav system
         self._receiveIRData = rospy.Subscriber('/IRLandmineDet', Bool, self.updateIRData, queue_size=1 )
         self.currentIRReadings = False
-        GPIO.setmode(GPIO.Board)
+        GPIO.setmode(GPIO.BOARD)
         GPIO.setup(7, GPIO.IN)
     def checkMine(self):
         if GPIO.input(7):
