@@ -8,5 +8,5 @@
 
     <node pkg="demining_mqp" type="SensorPlatformController.py" name="SensorPlatController" />
 
-
+    <node pkg="demining_mqp" type="LandmineDetection.py" name="LandmineDet" />
 </launch>

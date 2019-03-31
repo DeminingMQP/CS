@@ -26,7 +26,7 @@ class slider:
         self.totalStepCount = 0
         self.leftBound = 0
         self.rightBound = 0
-        self.speed = .006
+        self.speed = .004
 
     def zero(self):
         GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
@@ -88,8 +88,6 @@ class slider:
             self.CurrentMotorDirection = 1
             GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
 
-        rospy.sleep(1)
-
         while not(self.stepCount == motorStep):
             if (GPIO.input(self.RightLimitSwitchPin) == GPIO.LOW):
                 print "!!!!!!!right limit switch reached"
@@ -117,11 +115,13 @@ class slider:
                 self.CurrentMotorDirection = 0
                 GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
                 motorStep = self.stepCount
+                GPIO.output(self.MotorSpeedPin, GPIO.LOW)
             elif (self.stepCount == self.rightBound):
                 print "right bound reached"
                 self.CurrentMotorDirection = 1
                 GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
                 motorStep = self.stepCount
+                GPIO.output(self.MotorSpeedPin, GPIO.LOW)
 
         self._sendSliderPos.publish(self.stepCount, self.CurrentMotorDirection, self.leftBound, self.rightBound)
         

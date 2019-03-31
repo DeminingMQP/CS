@@ -32,25 +32,63 @@ class TestMD:
         self.StsRetractingPaint = 11
         self.StsGeneralError = 12
         self.MineDetected = False
+        self.FirstReading = True
+        self.MineFirstDetected1 = -1
+        self.MineLastDetected1 = -1
+        self.MineFirstDetected2 = -1
+        self.MineLastDetected2 = -1
+        self.NewMineDetected1 = True
+        self.NewMineDetected2 = True
         self.MineFirstDetected = -1
         self.MineLastDetected = -1
-        self.NewMineDetected = True
         self.sliderCurPos = 0
         self.sliderCurDir = 0
         self.didsliderchangedirection = False
         self.SensorArmStatus = 0
     def scanForMine(self):
-        if self.NewMineDetected and self.MineDetected:
-            self.NewMineDetected = False
-            self.MineFirstDetected = self.sliderCurPos
-        elif self.NewMineDetected is False and self.MineDetected:
-            self.MineLastDetected = self.sliderCurPos
-            if self.didsliderchangedirection:
+        if self.FirstReading:
+            print("Scanning for first Reading")
+            if self.NewMineDetected1 and self.MineDetected:
+                self.NewMineDetected1 = False
+                self.MineFirstDetected1 = self.sliderCurPos
+            elif self.NewMineDetected1 is False and self.MineDetected:
+                self.MineLastDetected1 = self.sliderCurPos
+                if self.didsliderchangedirection:
+                    self.MineFirstDetected = self.MineFirstDetected1
+                    self.MineLastDetected = self.MineLastDetected1
+                    self.markLandmine()
+                    self.NewMineDetected1 = True
+            elif self.NewMineDetected1 is False and self.MineDetected is False:
+                self.FirstReading = False
+                #self.markLandmine()
+                self.NewMineDetected1 = True
+        else:
+            print("Scanning for second Reading")
+            if self.NewMineDetected2 and self.MineDetected:
+                self.NewMineDetected2 = False
+                self.MineFirstDetected2 = self.sliderCurPos
+            elif self.NewMineDetected2 is False and self.MineDetected:
+                self.MineLastDetected2 = self.sliderCurPos
+                if self.didsliderchangedirection:
+                    self.MineFirstDetected = self.MineLastDetected1
+                    self.MineLastDetected = self.MineFirstDetected2
+                    self.markLandmine()
+                    self.NewMineDetected2 = True
+                    self.FirstReading = True
+            elif self.NewMineDetected2 is False and self.MineDetected is False:
+                self.FirstReading = True
+                self.MineFirstDetected = self.MineLastDetected1
+                self.MineLastDetected = self.MineFirstDetected2
                 self.markLandmine()
-                self.NewMineDetected = True
-        elif self.NewMineDetected is False and self.MineDetected is False:
-            self.markLandmine()
-            self.NewMineDetected = True
+                self.NewMineDetected2 = True
+            else:
+                if np.abs(self.MineLastDetected1-self.sliderCurPos) > 400:
+                    print("Second Reading not found")
+                    self.MineFirstDetected = self.MineFirstDetected1
+                    self.MineLastDetected = self.MineLastDetected1
+                    self.markLandmine()
+                    self.FirstReading = True
+
     def saveSliderData(self, data):
         self.sliderCurPos = data.motorstep
         if data.direction is not self.sliderCurDir:
@@ -71,19 +109,27 @@ class TestMD:
         if self.didsliderchangedirection:
             NeededPos = self.MineLastDetected
         else:
-            NeededPos = (self.MineLastDetected-self.MineFirstDetected)/2
+            NeededPos = (self.MineLastDetected+self.MineFirstDetected)/2
+        print(NeededPos)
         scommand = slidercommand()
         scommand.motorstep = NeededPos
         scommand.scanFreely = False
         self._sendSliderMsg.publish(scommand)
-        while self.sliderCurPos is not NeededPos:
+        rospy.sleep(1)
+        while self.sliderCurPos != NeededPos:
             rospy.sleep(.5)
         self._sendSAStatus.publish(self.MsgExtendPaint)
-        while self.SensorArmStatus is not self.StsSprayingPaint:
+        while self.SensorArmStatus != self.StsSprayingPaint:
             rospy.sleep(.5)
         rospy.sleep(1)#simulating robot driving back
         self._sendSAStatus.publish(self.MsgRetractPaint)
-        while self.SensorArmStatus is not self.StsRunning:
+        while self.SensorArmStatus != self.StsRunning:
+            rospy.sleep(.5)
+        scommand = slidercommand()
+        scommand.motorstep = self.MineLastDetected
+        scommand.scanFreely = False
+        self._sendSliderMsg.publish(scommand)
+        while self.sliderCurPos != self.MineLastDetected:
             rospy.sleep(.5)
         scommand = slidercommand()
         scommand.motorstep = -1
