@@ -29,9 +29,9 @@ if __name__ == '__main__':
 
     while not rospy.is_shutdown():
         rospy.sleep(20)
-        print "Stopping"
+        print ("Stopping")
         nav.sendmessage(nav.MsgExtendPaint, False)
         rospy.sleep(20)
-        print "Starting"
+        print ("Starting")
         nav.sendmessage(nav.MsgRetractPaint, True)
         rospy.sleep(10)

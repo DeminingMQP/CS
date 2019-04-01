@@ -5,8 +5,7 @@ import sys
 from flask import Flask, render_template, request, redirect, Response
 import random, json
 import math
-from graphics import *
-from rosmain import *
+#from rosmain import *
 import threading
 from random import *
 
@@ -100,8 +99,8 @@ def myFunction(form):
 	minY = 400000000
 	for index in range(0, len(x)):
 		print(x[index])
-		x[index] = math.floor(x[index] * 50000)
-		y[index] = math.floor(y[index] * 50000)
+		x[index] = math.floor(x[index] * 500000)
+		y[index] = math.floor(y[index] * 500000)
 	startLoc.append(x[0])
 	startLoc.append(y[0])
 	for index in range(1, len(x)):
@@ -132,8 +131,8 @@ def myFunction(form):
 	print(minX)
 	print(maxY)
 	print(minY)
-	for index in range(0, len(x)-1):
-		print("y = " + str(m[index]) + "x + " + str(b[index]))
+	#for index in range(0, len(x)-1):
+		#print("y = " + str(m[index]) + "x + " + str(b[index]))
 	xAxis = int((maxX - minX))
 	yAxis = int((maxY - minY))
 	print(xAxis, yAxis)
@@ -147,52 +146,48 @@ def myFunction(form):
 		for j in range(0, len(Grid)):
 			intersects = 0
 			for k in range(0, len(x)-1):
-				print(m[k], minX + j, b[k], minY + i)
+				#print(m[k], minX + j, b[k], minY + i)
 				#TODO add case for slope 0
 				if m[k] == "NaN":
 					if (x[k+1] < minX + j) and minY+i>min(coorY[k][0],coorY[k][1]) and minY+i<max(coorY[k][0],coorY[k][1]):
 						intersects += 1
-						print(k, "heree", 1)
-						print(x[k+1], minX + j)
+						#print(k, "heree", 1)
+						#print(x[k+1], minX + j)
 				elif m[k] > 0:
-					print("Negative")
+					#print("Negative")
 					if ((m[k] * (minX + j) + b[k]) > (minY + i)) and minY+i>=min(coorY[k][0],coorY[k][1]) and minY+i<max(coorY[k][0],coorY[k][1]):
 					#if ((m[k] * (minX + j) + b[k]) > (minY + i)):
 						intersects += 1
-						print(k, "heree", 2)
-					else:
-						print(i, j)
-						print("failed", ((m[k] * (minX + j) + b[k]) > (minY + i)),
-							  minY + i >= min(coorY[k][0], coorY[k][1]), minY + i < max(coorY[k][0], coorY[k][1]))
+						#print(k, "heree", 2)
+					#else:
+						#print(i, j)
+						#print("failed", ((m[k] * (minX + j) + b[k]) > (minY + i)),minY + i >= min(coorY[k][0], coorY[k][1]), minY + i < max(coorY[k][0], coorY[k][1]))
 
 				elif m[k] < 0:
-					print("positive")
+					#print("positive")
 					if ((m[k] * (minX + j) + b[k]) < (minY + i)) and minY+i>=min(coorY[k][0],coorY[k][1]) and minY+i<max(coorY[k][0],coorY[k][1]):
 					#if ((m[k] * (minX + j) + b[k]) < (minY + i)):
 						intersects += 1
-						print(k, "heree", 3)
-					else:
-						print(i,j)
-						print("failed", ((m[k] * (minX + j) + b[k]) < (minY + i)),minY+i>=min(coorY[k][0],coorY[k][1]),minY+i<max(coorY[k][0],coorY[k][1]))
+						#print(k, "heree", 3)
+					#else:
+						#print(i,j)
+						#print("failed", ((m[k] * (minX + j) + b[k]) < (minY + i)),minY+i>=min(coorY[k][0],coorY[k][1]),minY+i<max(coorY[k][0],coorY[k][1]))
 				# if(abs((m[k] * (minX + j) + b[k]) - (minY + i)))<1:
 				# 	intersects +=1
-				if m[k]=="NaN":
-					print("vertical")
-				else:
-					print(m[k] * (minX + j) + b[k], minY + i, "line" + str(k), m[k], (minX + j), b[k],
-					  min(coorY[k][0], coorY[k][1]), max(coorY[k][0], coorY[k][1]))
-			print("intersects", intersects)
+				#if m[k]=="NaN":
+					#print("vertical")
+				#else:
+					#print(m[k] * (minX + j) + b[k], minY + i, "line" + str(k), m[k], (minX + j), b[k],min(coorY[k][0], coorY[k][1]), max(coorY[k][0], coorY[k][1]))
+			#print("intersects", intersects)
 
 
 			if intersects % 2 == 1:
-				print(i,j)
+				#print(i,j)
 				Grid[j][i] = 5
 			#for k in range(0, len(x) - 1):
 				#if math.floor((m[k] * (minX + j) + b[k])) == (minY + i):
 					#Grid[j][i] = 4
-			print("", )
-			if i==1 and j==0:
-				Grid[j][i]=3
+			#print("", )
 	#printGrid(Grid)
 	print(len(Grid))
 	myVars.append(x)
@@ -210,7 +205,8 @@ app = Flask(__name__)
 def output():
     #return "Hello World"
 	# serve index template
-	return render_template('GoogleMapSelect.html', name='Joe')
+    print("something")
+    return render_template('GoogleMapSelect.html', name='Joe')
 
 @app.route('/receiver', methods = ['POST'])
 def worker():
@@ -260,13 +256,14 @@ def addMines():
 
 if __name__ == '__main__':
 	# run!
-	print("working")
-	app.run()
-	masterGrid = addMines()
-	#printGraphicGrid(Grid)
-	#printGraphicGrid(masterGrid)
-	
-	print(startGridLoc[1],startGridLoc[0], "startloc")
-	navigate(masterGrid,Grid,startGridLoc[1],startGridLoc[0])
-	#myPolygon()
+    print("working")
+    app.run()
+    masterGrid = addMines()
+    printGrid(Grid)
+    #printGraphicGrid(Grid)
+    #printGraphicGrid(masterGrid)
+    print("MAIN???")
+    #print(startGridLoc[1],startGridLoc[0], "startloc")
+    #navigate(masterGrid,Grid,startGridLoc[1],startGridLoc[0])
+    #myPolygon()
 

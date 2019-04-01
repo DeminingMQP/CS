@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+ 
+<html lang="en">
+<head>
+    <title>Pick Points on map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="jquery-3.3.1.js" type=”text/javascript”></script>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+
+    function initMaps() {
+        var points = Array();
+        var points2 = Array();
+        var startLocation
+
+        var map = new google.maps.Map(document.getElementById("map"), {
+            center: {
+                lat: 42.27548140758946,
+                lng: -71.80486849867248
+            },
+            zoom: 18,
+            mapTypeId: 'hybrid'
+
+        });
+
+        var marker = new google.maps.Marker({
+            position: {
+                lat: 42.27548140758946,
+                lng: -71.80486849867248
+            },
+            map: map,
+            draggable: true
+        });
+
+        var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+
+        var marker2 = new google.maps.Marker({
+            position: {
+                lat: 42.27548140758946,
+                lng: -71.80486849867248
+            },
+            map: map,
+            draggable: true,
+            icon: image
+        });
+
+        var image2 = 'https://maps.google.com/mapfiles/kml/shapes/library_maps.png';
+
+        var marker3 = new google.maps.Marker({
+            position: {
+                lat: 42.275486,
+                lng: -71.80486849867248
+            },
+            map: map,
+            draggable: true,
+            icon: image2
+        });
+
+        google.maps.event.addListener(marker, 'dragend', function(){
+            console.log(marker.getPosition().lat());
+            console.log(marker.getPosition().lng());
+            position = {lat: parseFloat(marker.getPosition().lat()), lng: parseFloat(marker.getPosition().lng())};
+            points.push(position);
+            console.log(points);
+            console.log("----------------------");
+            });
+
+        google.maps.event.addListener(marker2, 'dragend', function(){
+            console.log(marker2.getPosition().lat());
+            console.log(marker2.getPosition().lng());
+            position = {lat: parseFloat(marker2.getPosition().lat()), lng: parseFloat(marker2.getPosition().lng())};
+            startLocation = position
+            console.log("Define Start" + startLocation["lat"] + "," + startLocation["lng"])
+            });
+
+        google.maps.event.addListener(marker3, 'dragend', function(){
+            console.log(marker3.getPosition().lat());
+            console.log(marker3.getPosition().lng());
+            position = {lat: parseFloat(marker3.getPosition().lat()), lng: parseFloat(marker3.getPosition().lng())};
+            points2.push(position);
+            console.log(points2);
+            console.log("----------------------");
+            });
+            
+            
+
+
+        var polyControlDiv = document.createElement('div');
+        var polyControl = new PolyCreate(polyControlDiv, map);
+
+        var polyControlDiv2 = document.createElement('div');
+        var polyControl2 = new PolyCreate2(polyControlDiv, map);
+
+        polyControlDiv.index = 1;
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(polyControlDiv);
+
+        polyControlDiv2.index = 1;
+        map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(polyControlDiv2);
+
+        function PolyCreate(controlDiv, map) {
+
+            // Set CSS for the control border.
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = '#fff';
+            controlUI.style.border = '2px solid #fff';
+            controlUI.style.borderRadius = '3px';
+            controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.marginBottom = '22px';
+            controlUI.style.textAlign = 'Generate Polygon';
+            controlUI.title = 'Click to generate polygon';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior.
+            var controlText = document.createElement('div');
+            controlText.style.color = 'rgb(25,25,25)';
+            controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+            controlText.style.fontSize = '16px';
+            controlText.style.lineHeight = '38px';
+            controlText.style.paddingLeft = '5px';
+            controlText.style.paddingRight = '5px';
+            controlText.innerHTML = 'Generate Polygon';
+            controlUI.appendChild(controlText);
+
+            // Setup the click event listeners: simply set the map to Chicago.
+            controlUI.addEventListener('click', function() {
+              if (points !== undefined || points.length >= 0) {
+                var searchArea = new google.maps.Polygon({
+                    paths: points,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.35,
+                    draggable: false,
+                    editable: true
+                })
+              }
+              ;
+
+              searchArea.setMap(map);
+
+              marker.setMap(null);
+
+              google.maps.event.addListener(searchArea.getPath(), 'insert_at', function(){
+                  points = [];
+                  var vertices = searchArea.getPath();
+                  var contentString = '-------------------------------------------';
+                  // Iterate over the vertices.
+                  for (var i =0; i < vertices.getLength(); i++) {
+                    var xy = vertices.getAt(i);
+                    contentString += 'Coordinate ' + i + ':' + ' lat: ' + xy.lat() + ',' + ' lng: ' + xy.lng() + '--------';
+                    position = {lat: parseFloat(xy.lat()), lng: parseFloat(xy.lng())};
+                    points.push(position);
+                  }
+                  console.log(contentString);
+                  console.log(points);
+                  console.log('----------------------')
+              });
+
+              google.maps.event.addListener(searchArea.getPath(), 'set_at', function(){
+                  points = [];
+                  var vertices = searchArea.getPath();
+                  var contentString = '-------------------------------------------';
+                  // Iterate over the vertices.
+                  for (var i =0; i < vertices.getLength(); i++) {
+                    var xy = vertices.getAt(i);
+                    contentString += 'Coordinate ' + i + ':' + ' lat: ' + xy.lat() + ',' + ' lng: ' + xy.lng() + '--------';
+                    position = {lat: parseFloat(xy.lat()), lng: parseFloat(xy.lng())};
+                    points.push(position);
+                  }
+                  console.log(contentString);
+                  console.log(points);
+                  console.log('----------------------')
+              });
+
+              google.maps.event.addListener(searchArea.getPath(), 'remove_at', function(){
+                  points = [];
+                  var vertices = searchArea.getPath();
+                  var contentString = '-------------------------------------------';
+                  // Iterate over the vertices.
+                  for (var i =0; i < vertices.getLength(); i++) {
+                    var xy = vertices.getAt(i);
+                    contentString += 'Coordinate ' + i + ':' + ' lat: ' + xy.lat() + ',' + ' lng: ' + xy.lng() + '--------';
+                    position = {lat: parseFloat(xy.lat()), lng: parseFloat(xy.lng())};
+                    points.push(position);
+                  }
+                  console.log(contentString);
+                  console.log(points);
+                  console.log('----------------------')
+              });
+
+          });
+
+      var resetDiv = document.createElement('div');
+      var resetControl = new Reset(resetDiv, map);
+
+      resetDiv.index = 1;
+      map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(resetDiv);
+
+      var sendDiv = document.createElement('div');
+      var sendControl = new sendData(sendDiv, map);
+
+      sendDiv.index = 1;
+      map.controls[google.maps.ControlPosition.LEFT_CENTER].push(sendDiv);
+    }
+
+    function PolyCreate2(controlDiv, map) {
+
+            // Set CSS for the control border.
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = '#fff';
+            controlUI.style.border = '2px solid #fff';
+            controlUI.style.borderRadius = '3px';
+            controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.marginBottom = '22px';
+            controlUI.style.textAlign = 'Generate Polygon';
+            controlUI.title = 'Click to generate polygon';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior.
+            var controlText = document.createElement('div');
+            controlText.style.color = 'rgb(25,25,25)';
+            controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+            controlText.style.fontSize = '16px';
+            controlText.style.lineHeight = '38px';
+            controlText.style.paddingLeft = '5px';
+            controlText.style.paddingRight = '5px';
+            controlText.innerHTML = 'Generate Polygon 2';
+            controlUI.appendChild(controlText);
+
+            // Setup the click event listeners: simply set the map to Chicago.
+            controlUI.addEventListener('click', function() {
+              if (points2 !== undefined || points2.length >= 0) {
+                var searchArea = new google.maps.Polygon({
+                    paths: points2,
+                    strokeColor: '#00FF00',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#00FF00',
+                    fillOpacity: 0.35,
+                    draggable: false,
+                    editable: true
+                })
+              }
+              ;
+
+              searchArea.setMap(map);
+
+              marker3.setMap(null);
+
+              google.maps.event.addListener(searchArea.getPath(), 'insert_at', function(){
+                  points2 = [];
+                  var vertices = searchArea.getPath();
+                  var contentString = '-------------------------------------------';
+                  // Iterate over the vertices.
+                  for (var i =0; i < vertices.getLength(); i++) {
+                    var xy = vertices.getAt(i);
+                    contentString += 'Coordinate ' + i + ':' + ' lat: ' + xy.lat() + ',' + ' lng: ' + xy.lng() + '--------';
+                    position = {lat: parseFloat(xy.lat()), lng: parseFloat(xy.lng())};
+                    points2.push(position);
+                  }
+                  console.log(contentString);
+                  console.log(points2);
+                  console.log('----------------------')
+              });
+
+              google.maps.event.addListener(searchArea.getPath(), 'set_at', function(){
+                  points2 = [];
+                  var vertices = searchArea.getPath();
+                  var contentString = '-------------------------------------------';
+                  // Iterate over the vertices.
+                  for (var i =0; i < vertices.getLength(); i++) {
+                    var xy = vertices.getAt(i);
+                    contentString += 'Coordinate ' + i + ':' + ' lat: ' + xy.lat() + ',' + ' lng: ' + xy.lng() + '--------';
+                    position = {lat: parseFloat(xy.lat()), lng: parseFloat(xy.lng())};
+                    points2.push(position);
+                  }
+                  console.log(contentString);
+                  console.log(points2);
+                  console.log('----------------------')
+              });
+
+              google.maps.event.addListener(searchArea.getPath(), 'remove_at', function(){
+                  points2 = [];
+                  var vertices = searchArea.getPath();
+                  var contentString = '-------------------------------------------';
+                  // Iterate over the vertices.
+                  for (var i =0; i < vertices.getLength(); i++) {
+                    var xy = vertices.getAt(i);
+                    contentString += 'Coordinate ' + i + ':' + ' lat: ' + xy.lat() + ',' + ' lng: ' + xy.lng() + '--------';
+                    position = {lat: parseFloat(xy.lat()), lng: parseFloat(xy.lng())};
+                    points2.push(position);
+                  }
+                  console.log(contentString);
+                  console.log(points2);
+                  console.log('----------------------')
+              });
+
+          });
+    }
+
+
+      function Reset(controlDiv, map) {
+
+          // Set CSS for the control border.
+          var controlUIr = document.createElement('div');
+          controlUIr.style.backgroundColor = '#fff';
+          controlUIr.style.border = '2px solid #fff';
+          controlUIr.style.borderRadius = '3px';
+          controlUIr.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+          controlUIr.style.cursor = 'pointer';
+          controlUIr.style.marginBottom = '22px';
+          controlUIr.style.textAlign = 'Reset';
+          controlUIr.title = 'Click to reset';
+          controlDiv.appendChild(controlUIr);
+
+          // Set CSS for the control interior.
+          var controlTextr = document.createElement('div');
+          controlTextr.style.color = 'rgb(25,25,25)';
+          controlTextr.style.fontFamily = 'Roboto,Arial,sans-serif';
+          controlTextr.style.fontSize = '16px';
+          controlTextr.style.lineHeight = '38px';
+          controlTextr.style.paddingLeft = '5px';
+          controlTextr.style.paddingRight = '5px';
+          controlTextr.innerHTML = 'Reset';
+          controlUIr.appendChild(controlTextr);
+
+          // Setup the click event listeners: simply set the map to Chicago.
+          controlUIr.addEventListener('click', function() {
+            document.location.reload();
+          });
+        }
+
+        function sendData(controlDiv, map) {
+          // Set CSS for the control border.
+          var controlUIr = document.createElement('div');
+          controlUIr.style.backgroundColor = '#fff';
+          controlUIr.style.border = '2px solid #fff';
+          controlUIr.style.borderRadius = '3px';
+          controlUIr.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+          controlUIr.style.cursor = 'pointer';
+          controlUIr.style.marginBottom = '22px';
+          controlUIr.style.textAlign = 'Reset';
+          controlUIr.title = 'Click to Send Data';
+          controlDiv.appendChild(controlUIr);
+
+          // Set CSS for the control interior.
+          var controlTextr = document.createElement('div');
+          controlTextr.style.color = 'rgb(25,25,25)';
+          controlTextr.style.fontFamily = 'Roboto,Arial,sans-serif';
+          controlTextr.style.fontSize = '16px';
+          controlTextr.style.lineHeight = '38px';
+          controlTextr.style.paddingLeft = '5px';
+          controlTextr.style.paddingRight = '5px';
+          controlTextr.innerHTML = 'Send Data';
+          controlUIr.appendChild(controlTextr);
+
+          // Setup the click event listeners: simply set the map to Chicago.
+          controlUIr.addEventListener('click', function() {
+            console.log("words words words")
+            console.log(points)
+            console.log(startLocation)
+            console.log("WHY won' it log the start Location")
+            dataArray = {}
+            dataArray["lat0"] = startLocation["lat"]
+            dataArray["lng0"] = startLocation["lng"]
+            for (index = 1;index<points.length+1;index++){
+              dataArray["lat" + index] = points[index-1]["lat"]
+              dataArray["lng" + index] = points[index-1]["lng"]
+            }
+            console.log("sendData")
+            console.log(dataArray)
+            //dataArray = {"sample": [points[0]["lat"], points[0]["lng"]]}
+            $.post("receiver", dataArray , function(){
+                console.log("back")
+			       });
+          });
+        }
+
+}
+
+
+    window.onload = function () {
+        initMaps();
+
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbCT8V4AwYIiXpPjCEt3AAH_h9WJzRFws&callback=initMaps"
+        async defer></script>
+</body>
+</html>

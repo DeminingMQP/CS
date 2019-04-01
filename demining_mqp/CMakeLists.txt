@@ -57,6 +57,10 @@ find_package(catkin REQUIRED COMPONENTS
    sliderposition.msg
    fourbarposition.msg
    IMUOrientation.msg
+   coordinates.msg
+   mapNode.msg
+   array1d.msg
+   mapsAPI.msg
  )
 
 ## Generate services in the 'srv' folder
