@@ -41,7 +41,7 @@ def determineChargeLoc(minX,minY):
 				locJ = j
 	startGridLoc.append(locI)
 	startGridLoc.append(locJ)
-	Grid[locJ][locI] = 7
+	#Grid[locJ][locI] = 7
 
 def printGraphicGrid(Grid):
 	win = GraphWin("Minefield", 600, 600)
@@ -274,17 +274,24 @@ if __name__ == '__main__':
     printGrid(Grid)
     myMap = mapsAPI()
     print("made map")
-    for index in range(0,len(Grid)):
+    yCoorFile = open("yCoor.txt","w")
+    xCoorFile = open("xCoor.txt","w")
+    valueFile = open("values.txt","w")
+    for index in range(len(Grid)-1,-1,-1):
         row = array1d()
         for index2 in range(0,len(Grid[0])):
             node = mapNode()
             coor = coordinates()
-            node.value = Grid[index][index2]
-            coor.x=minCoor[0]+0.000002*index
-            coor.y=minCoor[1]+0.000002*index2
+            print(index,index2)
+            valueFile.write(str(Grid[index][index2]) + " ")
+            yCoorFile.write(str(minCoor[0]+0.000002*index) + " ")
+            xCoorFile.write(str(minCoor[1]+0.000002*index2) + " ")
             node.gps = coor           
             row.array.append(node)
             print(row)
+        valueFile.write("\n")
+        yCoorFile.write("\n")
+        xCoorFile.write("\n")
         myMap.grid.append(row)
     print("filled")
     
