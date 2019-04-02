@@ -24,9 +24,9 @@ class fourbar:
         self.Motor1SpeedPin = 16
         self.Motor1DirPin = 13
         self.Motor2EncPin1 = 31
-        self.Motor2EncPin2 = 33
+        self.Motor2EncPin2 = 29
         self.Motor2SpeedPin = 32
-        self.Motor2DirPin = 29
+        self.Motor2DirPin = 33
         GPIO.setmode(GPIO.Board)
         GPIO.setup(self.upPin, GPIO.IN)  # need to pick a pinbases
         GPIO.setup(self.downPin, GPIO.IN)  # need to pick a pin
