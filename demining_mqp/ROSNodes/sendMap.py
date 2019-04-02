@@ -6,7 +6,7 @@ from demining_mqp.msg import *
 
 def talker():
     pub = rospy.Publisher('maps', mapsAPI, queue_size=10)
-    rospy.init_node('baseStationMap', anonymous=True)
+    rospy.sleep(0.5)
     valueFile = open("values.txt","r")
     xCoorFile = open("xCoor.txt","r")
     yCoorFile = open("yCoor.txt","r")
@@ -56,9 +56,11 @@ def talker():
         rowIndex=0
         columnIndex +=1
     print(myMap)
+    pub.publish(myMap)
 
 
 if __name__ == '__main__':
+    rospy.init_node('baseStationMap', anonymous=True)
     try:
         talker()
     except rospy.ROSInterruptException:
