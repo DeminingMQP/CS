@@ -5,10 +5,10 @@ from geometry_msgs.msg import Point
 class baseListener:
     def __init__(self):
         self.mineLocations = []
-        self._receiveMine = rospy.Subscriber('/mineLocation',Point, self.record, queue_size=1 )
+        self._receiveMine = rospy.Subscriber('/mineLocation',Point, self.recording )
 
-	def record(self,data):
-	    print data
+    def recording(self,data):
+        print data
         self.mineLocations.append(data)
 	    
 	    

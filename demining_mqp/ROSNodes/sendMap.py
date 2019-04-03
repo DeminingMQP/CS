@@ -61,6 +61,7 @@ def talker():
 
 
 if __name__ == '__main__':
+    rospy.init_node('baseStationMap', anonymous=True)
     try:
         talker()
     except rospy.ROSInterruptException:
