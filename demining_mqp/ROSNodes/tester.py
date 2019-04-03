@@ -267,8 +267,6 @@ def addMines():
 if __name__ == '__main__':
 	# run!
     print("working")
-    rospy.init_node('baseStationMap', anonymous=True)
-    mapPub = rospy.Publisher('/maps', mapsAPI, queue_size=10)
     app.run()
     masterGrid = addMines()
     printGrid(Grid)
@@ -278,24 +276,15 @@ if __name__ == '__main__':
     xCoorFile = open("xCoor.txt","w")
     valueFile = open("values.txt","w")
     for index in range(len(Grid)-1,-1,-1):
-        row = array1d()
         for index2 in range(0,len(Grid[0])):
-            node = mapNode()
-            coor = coordinates()
             print(index,index2)
             valueFile.write(str(Grid[index][index2]) + " ")
             yCoorFile.write(str(minCoor[0]+0.000002*index) + " ")
             xCoorFile.write(str(minCoor[1]+0.000002*index2) + " ")
-            node.gps = coor           
-            row.array.append(node)
-            print(row)
         valueFile.write("\n")
         yCoorFile.write("\n")
         xCoorFile.write("\n")
-        myMap.grid.append(row)
     print("filled")
-    
-    mapPub.publish(myMap)
     #printGraphicGrid(Grid)
     #printGraphicGrid(masterGrid)
     print("MAIN???")
