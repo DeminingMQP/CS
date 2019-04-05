@@ -17,7 +17,7 @@ def talker():
         row = array1d()
         myNode = mapNode()
         for letter in line: 
-            if (letter == ' '):
+            if (letter == ','):
                 myNode.value=int(num)
                 row.array.append(myNode)                
                 num = ''
@@ -29,9 +29,10 @@ def talker():
         myMap.grid.append(row)
     rowIndex = 0
     columnIndex = 0
+    num = ''
     for line in xCoorFile:
         for letter in line:
-            if (letter == ' '):
+            if (letter == ','):
                 print(rowIndex,columnIndex)
                 myMap.grid[columnIndex].array[rowIndex].gps.x=float(num)            
                 num = ''
@@ -44,9 +45,10 @@ def talker():
         columnIndex +=1
     rowIndex = 0
     columnIndex = 0
+    num =''
     for line in yCoorFile:
         for letter in line:
-            if (letter == ' '):
+            if (letter == ','):
                 myMap.grid[columnIndex].array[rowIndex].gps.y=float(num)                  
                 num = ''
                 rowIndex+=1

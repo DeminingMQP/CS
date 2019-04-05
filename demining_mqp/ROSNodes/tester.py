@@ -278,9 +278,9 @@ if __name__ == '__main__':
     for index in range(len(Grid)-1,-1,-1):
         for index2 in range(0,len(Grid[0])):
             print(index,index2)
-            valueFile.write(str(Grid[index][index2]) + " ")
-            yCoorFile.write(str(minCoor[0]+0.000002*index) + " ")
-            xCoorFile.write(str(minCoor[1]+0.000002*index2) + " ")
+            valueFile.write(str(Grid[index][index2]) + ",")
+            yCoorFile.write(str(minCoor[0]+0.000002*index) + ",")
+            xCoorFile.write(str(minCoor[1]+0.000002*index2) + ",")
         valueFile.write("\n")
         yCoorFile.write("\n")
         xCoorFile.write("\n")
