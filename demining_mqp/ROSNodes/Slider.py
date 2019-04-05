@@ -20,7 +20,7 @@ class slider:
         #GPIO.setup(self.MotorStallPin, GPIO.IN)
         GPIO.setup(self.MotorDirectionPin, GPIO.OUT)
         GPIO.setup(self.MotorSpeedPin, GPIO.OUT)
-        self.ScanFreely = True
+        self.ScanFreely = False
         self.stepCount = 0
         self.stepDir = ""
         self.totalStepCount = 0
