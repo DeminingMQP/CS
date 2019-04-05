@@ -77,32 +77,33 @@ class fourbar:
         upPin = GPIO.input(self.upPin)
         downPin = GPIO.input(self.downPin)
 
-        if self.MaxLimitSwitchPin == HIGH:
-            GPIO.output(self.Motor1SpeedPin, GPIO.LOW)
-            GPIO.output(self.Motor2SpeedPin, GPIO.LOW)
-        else:
-            if upPin and downPin:
-                self._sendObstacle.publish(True)
-                self.pwm1.stop()
-                self.pwm2.stop()
-            elif upPin:
+        if upPin and downPin:
+            self._sendObstacle.publish(True)
+            self.pwm1.stop()
+            self.pwm2.stop()
+        elif upPin:
+            if self.MaxLimitSwitchPin == GPIO.HIGH:
+                GPIO.output(self.Motor1SpeedPin, GPIO.LOW)
+                GPIO.output(self.Motor2SpeedPin, GPIO.LOW)
+                print("At Max Height")
+            else:
                 self.m1dir = self.UP
                 GPIO.output(self.Motor1DirPin, self.m1dir)
                 GPIO.output(self.Motor2DirPin, self.m1dir)
-                #GPIO.output(self.Motor1SpeedPin, GPIO.HIGH)
-                #GPIO.output(self.Motor2SpeedPin, GPIO.HIGH)
+                GPIO.output(self.Motor1SpeedPin, GPIO.HIGH)
+                GPIO.output(self.Motor2SpeedPin, GPIO.HIGH)
                 print("Raising")
-            elif downPin:
-                self.m1dir = self.DOWN
-                GPIO.output(self.Motor1DirPin, self.m1dir)
-                GPIO.output(self.Motor2DirPin, self.m1dir)
-                #GPIO.output(self.Motor1SpeedPin, GPIO.HIGH)
-                #GPIO.output(self.Motor2SpeedPin, GPIO.HIGH)
-                print("Lowering")
-            else:
-                GPIO.output(self.Motor1SpeedPin, GPIO.LOW)
-                GPIO.output(self.Motor2SpeedPin, GPIO.LOW)
-                print("Stopped")
+        elif downPin:
+            self.m1dir = self.DOWN
+            GPIO.output(self.Motor1DirPin, self.m1dir)
+            GPIO.output(self.Motor2DirPin, self.m1dir)
+            GPIO.output(self.Motor1SpeedPin, GPIO.HIGH)
+            GPIO.output(self.Motor2SpeedPin, GPIO.HIGH)
+            print("Lowering")
+        else:
+            GPIO.output(self.Motor1SpeedPin, GPIO.LOW)
+            GPIO.output(self.Motor2SpeedPin, GPIO.LOW)
+            print("Stopped")
         #self.fbp.calcPos(self.m1e1Value)
         #self._sendFourBarData(self.fbp)
 
