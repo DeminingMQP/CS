@@ -82,7 +82,7 @@ class fourbar:
             self.pwm1.stop()
             self.pwm2.stop()
         elif upPin:
-            if self.MaxLimitSwitchPin == GPIO.HIGH:
+            if GPIO.input(self.MaxLimitSwitchPin) == GPIO.HIGH:
                 GPIO.output(self.Motor1SpeedPin, GPIO.LOW)
                 GPIO.output(self.Motor2SpeedPin, GPIO.LOW)
                 print("At Max Height")
