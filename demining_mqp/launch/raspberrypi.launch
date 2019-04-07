@@ -16,4 +16,6 @@
 
     <node pkg="demining_mqp" type="SubsystemController.py" name="subsyscontroller" />
 
+    <node pkg="demining_mqp" type="IMU.py" name="IMU" />
+
 </launch>
