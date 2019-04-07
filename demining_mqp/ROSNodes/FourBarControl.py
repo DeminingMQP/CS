@@ -18,7 +18,7 @@ class fourbar:
         self.upPin = 12
         self.downPin = 11
         self.Motor1EncPin1 = 15
-        self.Motor1EncPin2 = 18
+        self.Motor1EncPin2 = 22
         self.Motor1SpeedPin = 16
         self.Motor1DirPin = 13
         self.Motor2EncPin1 = 31
@@ -27,7 +27,7 @@ class fourbar:
         self.Motor2DirPin = 33
         self.UP = True
         self.DOWN = False
-        self.MaxLimitSwitchPin = 22
+        self.MaxLimitSwitchPin = 18
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(self.upPin, GPIO.IN)  # need to pick a pinbases
         GPIO.setup(self.downPin, GPIO.IN)  # need to pick a pin
@@ -35,7 +35,7 @@ class fourbar:
         GPIO.setup(self.Motor2DirPin, GPIO.OUT)
         GPIO.setup(self.Motor1SpeedPin, GPIO.OUT)
         GPIO.setup(self.Motor2SpeedPin, GPIO.OUT)
-        GPIO.setup(self.MaxLimitSwitchPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.MaxLimitSwitchPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         #GPIO.add_event_detect(self.MaxLimitSwitchPin, GPIO.RISING, callback=self.limitCallback())
 
         #GPIO.add_event_detect(15, GPIO.RISING, callback=self.motor1Enc1Callback(), bouncetime=5)
@@ -82,7 +82,7 @@ class fourbar:
             self.pwm1.stop()
             self.pwm2.stop()
         elif upPin:
-            if GPIO.input(self.MaxLimitSwitchPin) == GPIO.HIGH:
+            if GPIO.input(self.MaxLimitSwitchPin) == GPIO.LOW:
                 GPIO.output(self.Motor1SpeedPin, GPIO.LOW)
                 GPIO.output(self.Motor2SpeedPin, GPIO.LOW)
                 print("At Max Height")
