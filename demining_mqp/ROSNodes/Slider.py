@@ -68,6 +68,7 @@ class slider:
 
         self.CurrentMotorDirection = 0
         GPIO.output(self.MotorDirectionPin, self.CurrentMotorDirection)
+        self._sendSliderPos.publish(self.stepCount, self.CurrentMotorDirection, self.leftBound, self.rightBound)
         print "Homing Done"
 
 

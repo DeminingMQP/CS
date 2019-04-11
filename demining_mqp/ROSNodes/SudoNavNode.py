@@ -7,31 +7,35 @@ import std_msgs
 
 class sudonavnode:
     def __init__(self):
-        self._sendSAStatus = rospy.Publisher('/NavCommand', std_msgs.msg.Int8, queue_size=5)# send to SensorPlatform Control
-        self._sendSliderMsg = rospy.Publisher('sliderCommand', slidercommand, queue_size=5)
-        self.MsgStart = 1
-        self.MsgZeroMetalDetector = 2
-        self.MsgHomeOrientation = 3
-        self.MsgMarkLandmine = 4
-        self.MsgStop = 5
-        self.MsgExtendPaint = 6
-        self.MsgRetractPaint = 7
-    def sendmessage(self, data, data2):
-        self._sendSAStatus.publish(data)
-        scommand = slidercommand()
-        scommand.motorstep=0
-        scommand.scanFreely = data2
-        self._sendSliderMsg.publish(scommand)
+        self._StartSweep = rospy.Publisher('/StartSweep', std_msgs.msg.Int8, queue_size=1)
+        self._ContinueSweep = rospy.Publisher('/ContinueSweep', std_msgs.msg.Int8, queue_size=1)
+        self._StopSweep = rospy.Subscriber('/StopSweep', std_msgs.msg.Int8, self.SweepStopCallback, queue_size=1)
+        self._MineFound = rospy.Subscriber('/MineFound', std_msgs.msg.Int8, self.LandmineFoundCallback, queue_size=1)
+        self.SweepOccuring = False
+        self.LandmineFound = False
+    def Navigate(self):
+        if self.SweepOccuring == False:
+            rospy.sleep(2)
+            self._StartSweep.publish(1)
+            self.SweepOccuring = True
+        elif self.LandmineFound:
+            rospy.sleep(1)
+            self._ContinueSweep.publish(1)
+            self.LandmineFound = False
+        else:
+            rospy.sleep(1)
+
+    def SweepStopCallback(self, data):
+        self.SweepOccuring = False
+
+    def LandmineFoundCallback(self, data):
+        self.LandmineFound = True
+
 if __name__ == '__main__':
     rospy.init_node('SudoNav')
     nav = sudonavnode()
     rospy.sleep(1)
 
     while not rospy.is_shutdown():
-        rospy.sleep(20)
-        print ("Stopping")
-        nav.sendmessage(nav.MsgExtendPaint, False)
-        rospy.sleep(20)
-        print ("Starting")
-        nav.sendmessage(nav.MsgRetractPaint, True)
-        rospy.sleep(10)
+        nav.Navigate()
+        print("Running")

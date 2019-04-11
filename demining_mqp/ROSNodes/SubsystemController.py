@@ -111,7 +111,7 @@ class TestMD:
                             self.MineLastDetected = self.MineLastDetected1
                             self.markLandmine()
                             self.FirstReading = True
-                if self.SweepDirection == 0 and self.sliderCurPos == self.sliderMaxPos and self.NewMineDetected1 and self.NewMineDetected2:
+                if self.SweepDirection == 0 and self.sliderCurPos >= self.sliderMaxPos-10 and self.NewMineDetected1 and self.NewMineDetected2:
                     self.SweepDirection = 1
                     self.StartSweep = False
                     scommand = slidercommand()
@@ -120,7 +120,7 @@ class TestMD:
                     self._sendSliderMsg.publish(scommand)
                     self._StopSweep.publish(1)
 
-                elif self.SweepDirection == 1 and self.sliderCurPos == self.sliderMinPos and self.NewMineDetected1 and self.NewMineDetected2:
+                elif self.SweepDirection == 1 and self.sliderCurPos <= self.sliderMinPos+10 and self.NewMineDetected1 and self.NewMineDetected2:
                     self.SweepDirection = 0
                     self.StartSweep = False
                     scommand = slidercommand()
@@ -133,7 +133,7 @@ class TestMD:
     def saveSliderData(self, data):
         self.hasSliderHomed = True #this makes sure the slider has set data and therefor  homed itself before starting
         self.sliderCurPos = data.motorstep
-        if data.direction is not self.sliderCurDir:
+        if data.direction != self.sliderCurDir:
             self.didsliderchangedirection = True
         else:
             self.didsliderchangedirection = False
@@ -173,7 +173,7 @@ class TestMD:
         while self.SensorArmStatus != self.StsRunning:
             rospy.sleep(.5)
         scommand = slidercommand()
-        if(self.sliderCurDir == 0):#last direction should be the opposite direction as needed to move
+        if(self.sliderCurDir == 1):#last direction should be the opposite direction as needed to move
             neededPos = self.MineLastDetected + 100
             if neededPos>self.sliderMaxPos:
                 scommand.motorstep = self.sliderMaxPos
@@ -188,14 +188,14 @@ class TestMD:
 
         scommand.scanFreely = False
         self._sendSliderMsg.publish(scommand)
-        while self.sliderCurPos != self.MineLastDetected:
+        while self.sliderCurPos != NeededPos:
             rospy.sleep(.5)
         scommand = slidercommand()
         scommand.motorstep = -1
         scommand.scanFreely = True
         self._sendSliderMsg.publish(scommand)
 if __name__ == '__main__':
-    rospy.init_node('MDTest')
+    rospy.init_node('SubSystemController')
     test = TestMD()
     rospy.sleep(1)
     while not rospy.is_shutdown():
